@@ -44,51 +44,50 @@ sspan = 10;
 
 %
     %Recalculating Swet for changing fuselage diameter
-    Swet = pi*(Df/2)^2;
-  %  for phiw = [0:1:15] %wing sweep iteration
-  %      phit = phiw;
-            W = We(j) + Wb;
-            PE = Pe(j);
-                tapt = tapw;
+Swet = pi*(Df/2)^2;
+% phiw = [0:1:15] %wing sweep iteration
+%      phit = phiw;
+W = We(j) + Wb;
+PE = Pe(j);
+tapt = tapw;
 
-                %Lift Call
-                [W,Sw,St,CLw,CLt,CLa,CLwa,CLta,L,Vstall,bw,bt,Aw,At,ew,et] = lift(rho,Clw,Clt,Clwa,Clta,aoaw,aoat,ew,et,W,Vstall,Sw,St,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
-                %Getting a CL of the whole plane at stall speed for drag calc
-                dex = find(V==round(Vstall));
-                CL = CLa(dex);
+%Lift
+[W,Sw,St,CLw,CLt,CLa,CLwa,CLta,L,Vstall,bw,bt,Aw,At,ew,et] = lift(rho,Clw,Clt,Clwa,Clta,aoaw,aoat,ew,et,W,Vstall,Sw,St,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
+%Getting a CL of the whole plane at stall speed for drag calc
+dex = find(V==round(Vstall));
+CL = CLa(dex);
 
-                %Drag Call
-                [Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sw,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
-                %Performance Call
-                %planform surface area of plane
-                S = Sw+St; %assuming only wings provide lift
-                %robust alt. but possibly error prone
-                %S = L(1)/(.5 * arCL(1) * V(1)^2 * rho);
-                %k calc
-                kw = 1/(pi*Aw*ew);
-                [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD(dex),CDo(dex),Pav,Pr,W,Vhead,Vstall);
-                jj = find(min(D));
-                if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
-                    fprintf('Success! \n') %in case we do generate one then add portion to display variables
-                    fprintf('j =')
-                    disp(j)
-                    fprintf('tapw')
-                    disp(tapw)
-                    fprintf('Df')
-                    disp(Df)
-                    fprintf('Capacity of battery Ah')
-                    disp(C)
-                    fprintf('Sto =')
-                    disp(Sto)
-                    fprintf('Sl =')
-                    disp(Sl)
-                    pause;
-                    close all;
-                else
-                    fprintf('end of test \n') %for debug
-                    close all;
-                end
-            end
-        end
-    %end
+%Drag
+[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sw,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
+%Performance Call
+%planform surface area of plane
+S = Sw+St; %assuming only wings provide lift
+%robust alt. but possibly error prone
+%S = L(1)/(.5 * arCL(1) * V(1)^2 * rho);
+%k calc
+kw = 1/(pi*Aw*ew);
+
+%Performance
+[Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD(dex),CDo(dex),Pav,Pr,W,Vhead,Vstall);
+
+%Spec Verification
+if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
+fprintf('Success! \n') %in case we do generate one then add portion to display variables
+fprintf('j =')
+disp(j)
+fprintf('tapw')
+disp(tapw)
+fprintf('Df')
+disp(Df)
+fprintf('Capacity of battery Ah')
+disp(C)
+fprintf('Sto =')
+disp(Sto)
+fprintf('Sl =')
+disp(Sl)
+pause;
+close all;
+else
+fprintf('end of test \n') %for debug
+close all;
 end
