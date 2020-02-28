@@ -1,4 +1,5 @@
 # AircraftOpti
 Preliminary Aircraft Design Optimizer
 
-Is a group project
+TODO: Debug Drag coefficient as it grows way out of proportion
+Run trials and gather specs
