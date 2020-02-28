@@ -29,7 +29,7 @@ bw = 10.5; bt = bw/2; %Wingspans
 aoaw = 5; aoat = aoaw; %angle of attack for wing and tail
 
 %AIRCRAFT DATA
-Wb = 400; % weight of the body(minus engine) [kg] 
+Wb = 400; % weight of the body(minus engine) [kg]
 %engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 h = 1.8;       %height of aircraft (m)
 t = bw;       %approximate max horizontal thickness along the vertical (m)
@@ -42,23 +42,21 @@ Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 sspan = 10;
 
-%Actual Loop Portion
-%Will iterate through several different possibilities for certain variables
-for Df = [.1:.2:1.5]
+%
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2;
   %  for phiw = [0:1:15] %wing sweep iteration
   %      phit = phiw;
-        for j = [1:1:length(Pe)] %engine power iteration [W]
             W = We(j) + Wb;
             PE = Pe(j);
-            for tapw = [0.2:0.05:0.4] %taper ratio iteration
                 tapt = tapw;
-                %Lift Call        
+
+                %Lift Call
                 [W,Sw,St,CLw,CLt,CLa,CLwa,CLta,L,Vstall,bw,bt,Aw,At,ew,et] = lift(rho,Clw,Clt,Clwa,Clta,aoaw,aoat,ew,et,W,Vstall,Sw,St,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
                 %Getting a CL of the whole plane at stall speed for drag calc
                 dex = find(V==round(Vstall));
                 CL = CLa(dex);
+
                 %Drag Call
                 [Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sw,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
                 %Performance Call
