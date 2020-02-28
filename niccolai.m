@@ -110,7 +110,7 @@ Wau=1
 
 %% Payload Weight
 
-Wpl=40;
+Wpl=40; %Air filter weight
 
 %% TOTAL WEIGHT
 
