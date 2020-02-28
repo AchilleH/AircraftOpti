@@ -77,6 +77,8 @@ for Df = [.1:.2:1.5]
                 [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
                 %% Neutral Point Call
                 [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
+                %% Static Margin Calc
+                staticmargin = XCG/c-hn;
                 %Performance Call
                 %planform surface area of plane
                 S = Sw+St; %assuming only wings provide lift
