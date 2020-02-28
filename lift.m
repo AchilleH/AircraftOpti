@@ -1,4 +1,4 @@
-function [W,Sw,St,CLw,CLt,CLa,CLwa,CLta,L,Vstall,bw,bt,ARw,ARt,ew,et] = lift(rho,Clw,Clt,Clwa,Clta,aoaw,aoat,ew,et,W,Vstall,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)
+function [W,Sw,St,CLw,CLt,CLa,CLwa,CLta,L,Vstall,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)
 %Lift Calculation Block,[W,Sw,St,CLw,CLt,arCL,CLwa,CLta,L,Vstall,bw,bt,ARw,ARt,ew,et] = fixlift(rho,Clw,Clt,Clwa,Clta,ew,et,W,Vstall,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)  Leave a 0 in 1 argument to have it return the design
 %TODO
 %Edit CLa area to use new Mach dependent formula
@@ -58,43 +58,21 @@ else
 end
 
 %% Getting 3d CLa and Plotting CLa over specified range
+%using equation from design textbook
 %beta = 1-M^2; % M is 
 %nu = Cla/(2*pi/beta)
 M = Vrange./343; %Mach number were c is in m/s
 beta = 1-M^2;
-if(Clwa ~= 0 && ew ~= 0)
-    CLwa = Clwa/(1+(Clwa/(pi*ARw*ew)));
-    PCLa = CLwa * aoarange;
-    figure(1)
-    plot(aoarange,PCLa)
-    title('Lift Polar: Wing');
-    xlabel('Angle of Attack [deg]');
-    ylabel('CL');
-end
-if(Clw ~= 0 && Clwa ~= 0)
-    a = Clw/Clwa;
-    CLw = Clwa * a;
-end
-%
-if(Clta ~= 0 && et ~= 0)
-    CLta = Clta/(1+(Clta/(pi*ARt*et)));
-    PCLa = CLta * aoarange;
-    figure(2)
-    plot(aoarange,PCLa)
-    title('Lift Polar: Tail');
-    xlabel('Angle of Attack [deg]');
-    ylabel('CL');
-end
-if(Clt ~= 0 && Clta ~= 0)
-    a = Clt/Clta;
-    CLt = Clta * a;
-end
+nuw = Clwa/(2*pi/beta);
+nut = Clta/(2*pi/beta);
+CLwa = getCL(beta,nuw,phiw,Sw,Sref,df,bw,ARw);
+CLta = getCL(beta,nut,phit,St,Sref,df,bt,ARt);
 
 %% running lift Equation calculations
 if(Vstall == 0)
     Vstall = sqrt(W/(.5*rho*(Sw*CLw + St*CLt/Sw)));
 elseif(Sw == 0)
-    Sw = W/(.5*rho*CLw*Vstall^2) - St*CLt/CLw/Sw;
+    Sw = W./(.5.*rho.*CLw.*Vrange.^2) - St*CLt/CLw/Sw;
 elseif(St == 0)
     St = W/(.5*rho*CLt*Vstall^2) - Sw*CLw/CLt/St;
 % elseif(Clw == 0)
@@ -125,6 +103,36 @@ xlabel('Velocity [m/s]')
 ylabel('Lift [N]')
 end
 
-function [CLa] = getCL(Cla,beta,nu,phi)
-CLa = (2.*pi.*A)./(2+sqrt(4 + (A^2.*beta^2./nu^2).*((1+tan(phi)^2)/)
+function [CLa] = getCL(beta,nu,phi,S,Sref,df,b,A)
+F = 1.07*S/Sref*(1+df/b)^2;
+CLa = (2.*pi.*A).*F./(2+sqrt(4 + (A^2.*beta^2./nu^2).*((1+tan(phi)^2)/beta^2)));
 end
+
+%% Retired Code
+% if(Clwa ~= 0 && ew ~= 0)
+%     CLwa = Clwa/(1+(Clwa/(pi*ARw*ew)));
+%     PCLa = CLwa * aoarange;
+%     figure(1)
+%     plot(aoarange,PCLa)
+%     title('Lift Polar: Wing');
+%     xlabel('Angle of Attack [deg]');
+%     ylabel('CL');
+% end
+% if(Clw ~= 0 && Clwa ~= 0)
+%     a = Clw/Clwa;
+%     CLw = Clwa * a;
+% end
+% %
+% if(Clta ~= 0 && et ~= 0)
+%     CLta = Clta/(1+(Clta/(pi*ARt*et)));
+%     PCLa = CLta * aoarange;
+%     figure(2)
+%     plot(aoarange,PCLa)
+%     title('Lift Polar: Tail');
+%     xlabel('Angle of Attack [deg]');
+%     ylabel('CL');
+% end
+% if(Clt ~= 0 && Clta ~= 0)
+%     a = Clt/Clta;
+%     CLt = Clta * a;
+% end
