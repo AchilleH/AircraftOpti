@@ -13,7 +13,13 @@ Emax = 0; Rmax = 0;
 RCmin = 0; RCmax = 0;
 gamMin = 0; gamMax = 0;
 Rmin = 0;
+downwasheffect = 0;
 
+%% WEIGHT DISTRIBUTION
+
+Xarmarray = [];
+Zarmarray = [];
+weightarray = [];
 
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
@@ -41,6 +47,12 @@ Df = 0;      %diameter of fuselage
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 sspan = 10;
+fuselageL = 10; % Length of the fuselage from tip
+noseX = 0; noseL = 1; % Position of start of nose cone from tip; Length of nose cone
+wingX = 1; wingL = c; % Position of start of wing from tip; Chord of wing
+tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail
+tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone
+tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE
 
 %Actual Loop Portion
 %Will iterate through several different possibilities for certain variables
@@ -61,6 +73,10 @@ for Df = [.1:.2:1.5]
                 CL = CLa(dex);
                 %Drag Call
                 [Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sw,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
+                %% CG Call
+                [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
+                %% Neutral Point Call
+                [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
                 %Performance Call
                 %planform surface area of plane
                 S = Sw+St; %assuming only wings provide lift
