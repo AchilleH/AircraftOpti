@@ -23,10 +23,10 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
 %     Y = ;       %max thickness line sweep angl (degrees)
 %    V = [0:47];       %aircraft velocity (m/s)
     a = sqrt(gamma*Rair*Tair);      %speed of sound (m/s)
-    M = V/a;        %mach number
+    M = V./a;        %mach number
     mew = 1.77907876*10^(-6);     %dynamic viscosity of fluid (N s/m^2)
     v = mew/rho;     %kinematic viscosity (m^2/s)
-    Re = V*c/v;       %reynold's number
+    Re = V.*c/v;       %reynold's number
 
 %%    
 %%%Calculating Induced Drag Coefficient
