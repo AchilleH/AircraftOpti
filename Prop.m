@@ -10,10 +10,11 @@ a = sqrt(gamma*Rair*Tair);      %speed of sound (m/s)
 n = 2975/60;   %prop speed rps
 new = 0.9; %propulsive efficiency of prop unit
 
-For D = 1:15   %prop diameter, m
+for D = 1:15   %prop diameter, m
 CS = V.*(rho/.Pe/n^2)^0.2; %some coefficient
 CP = Pe./rho/n^3/D^5; %pressure coefficient
 %CT = T/rho/n^2/D^4; 
+end
 end
 
 
