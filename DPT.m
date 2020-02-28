@@ -52,9 +52,11 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     %Leakage Drag, CDleak (due to 'inhalation' and 'exhalation' of filtered air)
     intakearea = 0.3302^2;  %intake area in m^2
     A = intakearea;
-    mdot = rho*A.*V
-    Rdrag = mdot.*V;
-    q = 0.5*rho*Sref*(V.^2);
+    air = 330;  %air delivered cfm
+    vel = air/60*(.3048^3)/A;  %inlet velocity in m/s
+    mdot = rho*A*vel;
+    Rdrag = mdot*vel;
+    q = 0.5*rho*Sref*(vel^2);
     CDleak = Rdrag/q;
 %     fricfrac1 = 0.28;   %prefilter friction factor
 %     fricfrac2 = 0.6;    %carbon filter friction factor
