@@ -1,7 +1,7 @@
 # AircraftOpti
 Preliminary Aircraft Design Optimizer
 
-##Optimization
+## Optimization
 goal is to incorporate stability funcitons into main script as well as have the script store all trials and their successes for future viewing 
 
 TODO:
