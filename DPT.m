@@ -56,7 +56,7 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     vel = air/60*(.3048^3)/A;  %inlet velocity in m/s
     mdot = rho*A*vel;
     Rdrag = mdot*vel;
-    q = 0.5*rho*Sref*(vel^2);
+    q = 0.5*rho*Sref*(V.^2);
     CDleak = Rdrag/q;
 %     fricfrac1 = 0.28;   %prefilter friction factor
 %     fricfrac2 = 0.6;    %carbon filter friction factor
