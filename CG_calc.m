@@ -1,7 +1,5 @@
 function [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray)
 
-XCG = 0;
-ZCG = 0;
 Wtotal = 0;
 MXtotal = 0;
 MZtotal = 0;

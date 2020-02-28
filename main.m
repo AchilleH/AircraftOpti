@@ -34,10 +34,11 @@ Wb = 400; % weight of the body(minus engine) [kg]
 h = 1.8;       %height of aircraft (m)
 t = bw;       %approximate max horizontal thickness along the vertical (m)
 Pe = [20*10^3:5*10^3:75*10^3]; %engine power [W]
-We = [192.5:27.5:495];
+We = [192.5:27.5:495]; %engine weight
 xdivc = .7;   %chord wise position of max thickness (m)
 Swet = 0;    %wetted area (m^2) CALC AGAIN BELOW
-Df = 0;      %diameter of fuselage
+Sref = Sw;   %Reference Surface Area
+Df = 1;      %diameter of fuselage
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 sspan = 10;
@@ -47,18 +48,19 @@ sspan = 10;
 Swet = pi*(Df/2)^2;
 % phiw = [0:1:15] %wing sweep iteration
 %      phit = phiw;
+j = 1;
 W = We(j) + Wb;
 PE = Pe(j);
 tapt = tapw;
 
 %Lift
-[W,Sw,St,CLw,CLt,CLa,CLwa,CLta,L,Vstall,bw,bt,Aw,At,ew,et] = lift(rho,Clw,Clt,Clwa,Clta,aoaw,aoat,ew,et,W,Vstall,Sw,St,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
+[W,Sw,St,CLwa,CLta,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
 %Getting a CL of the whole plane at stall speed for drag calc
 dex = find(V==round(Vstall));
 CL = CLa(dex);
 
 %Drag
-[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sw,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
+[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sref,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
 %Performance Call
 %planform surface area of plane
 S = Sw+St; %assuming only wings provide lift
