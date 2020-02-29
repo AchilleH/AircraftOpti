@@ -79,13 +79,12 @@ for nn = 1:n
     CDprot = 0;
     %%%Total Parasitic Drag Coefficient, CDo
     CDo =  K.*Q.*Cf.*(Swet/Sref)+CDmisc+CDprot; 
-    CDo = CDo + Rdrag;
 %%%Total Drag  
     CD = zeros(n,m);
     CD([nn],:) = CDi + CDo;
     D = q.*CD;
     Di = q.*CDi;
-    Do = q.*CDo;
+    Do = q.*CDo+Rdrag;
 %%%Finding Max L/D
 %   CL([n],:) = CLw([n],:) + CLt([n],:);
     Tr = D;         %thrust required
