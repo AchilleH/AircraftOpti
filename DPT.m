@@ -56,8 +56,9 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     vel = air/60*(.3048^3)/A;  %inlet velocity in m/s
     mdot = rho*A*vel;
     Rdrag = mdot*vel;
-    q = 0.5*rho*Sref*(V.^2);
-    CDleak = Rdrag/q;
+%     q = 0.5*rho*Sref*(V.^2);
+%     CDleak = Rdrag/q;
+%%old CDleak calculation (resulted in 10^6 drag)
 %     fricfrac1 = 0.28;   %prefilter friction factor
 %     fricfrac2 = 0.6;    %carbon filter friction factor
 %     fricfrac3 = fricfrac1;  %HyperHepa filter friction factor
@@ -82,7 +83,8 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     CDprot = 0;
     
     %%%Total Parasitic Drag Coefficient, CDo
-    CDo =  K.*Q.*Cf.*(Swet/Sref)+CDmisc+CDleak+CDprot; 
+    CDo =  K.*Q.*Cf.*(Swet/Sref)+CDmisc+CDprot; 
+    CDo = CDo + Rdrag;
 
 %%%Total Drag  
     CD = CDi + CDo;
