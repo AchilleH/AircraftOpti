@@ -27,7 +27,7 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     mew = 1.77907876*10^(-6);     %dynamic viscosity of fluid (N s/m^2)
     v = mew/rho;     %kinematic viscosity (m^2/s)
     Re = V.*c/v;       %reynold's number
-    q = 0.5*rho*Area*(V.^2);
+    q = 0.5*rho*Swet*(V.^2);
 
 %%    
 %%%Calculating Induced Drag Coefficient
