@@ -14,6 +14,10 @@ RCmin = 0; RCmax = 0;
 gamMin = 0; gamMax = 0;
 Rmin = 0;
 
+%% WEIGHT DISTRIBUTION
+Xarmarray = []; % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+Zarmarray = []; % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+weightarray = []; % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
 
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
@@ -43,6 +47,12 @@ Df = 1;      %diameter of fuselage
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 sspan = 10;
+fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
+noseX = 0; noseL = 1; % Position of start of nose cone from tip; Length of nose cone USED IN INERTIAL AND NEUTRAL POINT CALC
+wingX = 1; wingL = c; % Position of start of wing from tip; Chord of wing USED IN INERTIAL AND NEUTRAL POINT CALC
+tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail USED IN INERTIAL AND NEUTRAL POINT CALC
+tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone USED IN INERTIAL AND NEUTRAL POINT CALC
+tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
 %
     %Recalculating Swet for changing fuselage diameter
@@ -70,6 +80,13 @@ S = Sw+St; %assuming only wings provide lift
 %k calc
 kw = 1/(pi*Aw*ew);
 
+%% CG
+[XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
+%% Neutral Point
+[hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
+%% Static Margin
+staticmargin = XCG/c-hn;
+
 %Performance
 [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD(dex),CDo(dex),Pav,Pr,W,Vhead,Vstall);
 
@@ -88,6 +105,8 @@ fprintf('Sto =')
 disp(Sto)
 fprintf('Sl =')
 disp(Sl)
+fprintf('static margin =')
+disp(staticmargin)
 pause;
 close all;
 else
