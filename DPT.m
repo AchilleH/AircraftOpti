@@ -23,10 +23,10 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
 %     Y = ;       %max thickness line sweep angl (degrees)
 %    V = [0:47];       %aircraft velocity (m/s)
     a = sqrt(gamma*Rair*Tair);      %speed of sound (m/s)
-    M = V/a;        %mach number
+    M = V./a;        %mach number
     mew = 1.77907876*10^(-6);     %dynamic viscosity of fluid (N s/m^2)
     v = mew/rho;     %kinematic viscosity (m^2/s)
-    Re = V*c/v;       %reynold's number
+    Re = V.*c/v;       %reynold's number
 
 %%    
 %%%Calculating Induced Drag Coefficient
@@ -39,40 +39,52 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     %Form Factor, K
     tdivc = t/c;        %thickness to chord ratio
     K = (1 + (0.6/xdivc)*tdivc + 100*(tdivc^4))*1.34*(M.^0.18)*((cos(Y))^0.28);
+    
     %Interference Factor, Q
     Q = 1;      %fuselages and wings assumed negligible interference
+    
     %Flat Plate Skin Friction, Cf
     Cf = 0.455./((log(Re).^2.58).*(1 + 0.144*M.^2).^0.65);
+    
     %Miscellaneous Drag, CDmisc (due to flaps or unretracted landing gear)
     CDmisc = 0;
+    
     %Leakage Drag, CDleak (due to 'inhalation' and 'exhalation' of filtered air)
-    fricfrac1 = 0.28;   %prefilter friction factor
-    fricfrac2 = 0.6;    %carbon filter friction factor
-    fricfrac3 = fricfrac1;  %HyperHepa filter friction factor
-    Pair = g*10^3;    %pressure of still air in Force/m^2
     intakearea = 0.3302^2;  %intake area in m^2
-    N = Pair*intakearea;    %normal force of still air
-    CDleakpercubicmeter = fricfrac1*N+fricfrac2*N+fricfrac3*N;
-    FilterSA1 = 2.787;  %PreFilter surface area in m^2
-    FilterSA2 = 3.894;  %Carbon filter surface area in m^2
-    FilterSA3 = 4.924;  %HyperHepa filter surface area in m^2
-    SingleModuleSA = FilterSA1+FilterSA2+FilterSA3; %total surface area of one module (3 air filters) in m^2
-    ModNum = 26;    %Num of modules needed to filter 10^6 cf2h based on modules capable of 330cfm
-    ModuleSA = SingleModuleSA*ModNum;   %surface area of all filters in the body (m^2)
-    CDleak = CDleakpercubicmeter*ModuleSA;  %leakage drag for all modules
-    Wprefilter = 1.2224;
-    Wcarbonfilter = 2.5;
-    Whyperhepafilter = 2.1044;
-    Wfilters = ModNum*(Wprefilter+Wprefilter+Whyperhepafilter); %weight of all filters in kg
+    A = intakearea;
+    air = 330;  %air delivered cfm
+    vel = air/60*(.3048^3)/A;  %inlet velocity in m/s
+    mdot = rho*A*vel;
+    Rdrag = mdot*vel;
+    q = 0.5*rho*Sref*(V.^2);
+    CDleak = Rdrag/q;
+%     fricfrac1 = 0.28;   %prefilter friction factor
+%     fricfrac2 = 0.6;    %carbon filter friction factor
+%     fricfrac3 = fricfrac1;  %HyperHepa filter friction factor
+%     Pair = g*10^3;    %pressure of still air in Force/m^2
+%     intakearea = 0.3302^2;  %intake area in m^2
+%     N = Pair*intakearea;    %normal force of still air
+%     CDleakpercubicmeter = (fricfrac1+fricfrac2+fricfrac3)*N;
+%     FilterSA1 = 2.787;  %PreFilter surface area in m^2
+%     FilterSA2 = 3.894;  %Carbon filter surface area in m^2
+%     FilterSA3 = 4.924;  %HyperHepa filter surface area in m^2
+%     SingleModuleSA = FilterSA1+FilterSA2+FilterSA3; %total surface area of one module (3 air filters) in m^2
+      ModNum = 26;    %Num of modules needed to filter 10^6 cf2h based on modules capable of 330cfm
+%     ModuleSA = SingleModuleSA*ModNum;   %surface area of all filters in the body (m^2)
+%     CDleak = CDleakpercubicmeter*ModuleSA;  %leakage drag for all modules
+      Wprefilter = 1.2224;
+      Wcarbonfilter = 2.5;
+      Whyperhepafilter = 2.1044;
+      Wfilters = ModNum*(Wprefilter+Wprefilter+Whyperhepafilter); %weight of all filters in kg
+    
     %Protuberance Drag, CDprot (due to things that stick out of the body,
     %like the booms for example)
     CDprot = 0;
+    
     %%%Total Parasitic Drag Coefficient, CDo
     CDo =  K.*Q.*Cf.*(Swet/Sref)+CDmisc+CDleak+CDprot; 
 
-    %TEMPORARYY
-    %CDo = 0;
-%%%Total Drag
+%%%Total Drag  
     CD = CDi + CDo;
     q = 0.5*rho*Sref*(V.^2);
     D = q.*CD;

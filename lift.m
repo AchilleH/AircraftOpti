@@ -7,6 +7,7 @@ function [W,Sw,St,CLwa,CLta,CLw,CLt,CLwmax,CLtmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = l
 %Leave a 0 in Cla to have it not generate a lift polar.
 
 %e = 0.7 for rect, 1 for ellipse or taper of ~0.3-0.4
+
 aoa = [-8:1:8];
 
 %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0

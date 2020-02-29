@@ -18,6 +18,7 @@ Rmin = 0;
 Xarmarray = []; % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
 Zarmarray = []; % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
 weightarray = []; % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+downwash = 0; %downwash effect on tail
 
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
