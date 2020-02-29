@@ -1,4 +1,4 @@
-function [W,Sw,St,CLwa,CLta,CLw,CLt,CLwmax,CLtmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)
+function [W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)
 %Lift Calculation Block,[W,Sw,St,CLwa,CLta,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)  Leave a 0 in 1 argument to have it return the design
 %value. For CL leave a 0 in Cl to have it generate CL. Df is fuselage
 %diameter and will be used to approximate e if e == 0, along with
@@ -82,8 +82,11 @@ Lt = meshgrid(qt,aoa);
      Lw(I,:) = Lw(I,:) .* CLw(I,:);
      Lt(I,:) = Lt(I,:) .* CLw(I,:);
     end
+    S = Sw+St;
     CLwmax = CLw(length(aoa),:);
     CLtmax = CLt(length(aoa),:);
+    CLmax = Sw/S*CLwmax + St/S*CLtmax;
+    CL = Sw/S*CLw + St/S*CLt;
 end
 
 

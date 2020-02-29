@@ -33,6 +33,7 @@ phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 aoaw = 5; aoat = aoaw; %angle of attack for wing and tail
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
+T = 0.1*c; %Airfoil thickness
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
@@ -47,6 +48,7 @@ Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
+%Stability Specific Variables
 sspan = 10;
 fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
 noseX = 0; noseL = 1; % Position of start of nose cone from tip; Length of nose cone USED IN INERTIAL AND NEUTRAL POINT CALC
@@ -55,31 +57,24 @@ tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail USED I
 tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone USED IN INERTIAL AND NEUTRAL POINT CALC
 tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
-%
-    %Recalculating Swet for changing fuselage diameter
-Swet = pi*(Df/2)^2;
-% phiw = [0:1:15] %wing sweep iteration
-%      phit = phiw;
-j = 1;
-W = We(j) + Wb;
+j = 1; %var to control engine choice
+W = Wb + We(j);
 PE = Pe(j);
-tapt = tapw;
+%Recalculating Swet for changing fuselage diameter
+Swet = pi*(Df/2)^2 + T*bw + T*bt;
 
 %Lift
-[W,Sw,St,CLwa,CLta,CLw,CLt,CLwmax,CLtmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
-%Getting a CL of the whole plane at stall speed for drag calc
-dex = find(V==round(Vstall));
-CL = CLa(dex);
+[W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
 
-%Drag
-[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sref,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
+%Drag, second Swet is input for Sref in DPT
+[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
 %Performance Call
 %planform surface area of plane
 S = Sw+St; %assuming only wings provide lift
-%robust alt. but possibly error prone
-%S = L(1)/(.5 * arCL(1) * V(1)^2 * rho);
 %k calc
 kw = 1/(pi*Aw*ew);
+%Performance
+[Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
 
 %% CG
 [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
@@ -87,10 +82,6 @@ kw = 1/(pi*Aw*ew);
 [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
 %% Static Margin
 staticmargin = XCG/c-hn;
-
-%Performance
-[Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD(dex),CDo(dex),Pav,Pr,W,Vhead,Vstall);
-
 %Spec Verification
 if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
 fprintf('Success! \n') %in case we do generate one then add portion to display variables

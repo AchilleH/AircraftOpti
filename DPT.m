@@ -57,7 +57,7 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     mdot = rho*A*vel;
     Rdrag = mdot*vel;
     q = 0.5*rho*Sref*(V.^2);
-    CDleak = Rdrag/q;
+    CDleak = Rdrag./q;
 %     fricfrac1 = 0.28;   %prefilter friction factor
 %     fricfrac2 = 0.6;    %carbon filter friction factor
 %     fricfrac3 = fricfrac1;  %HyperHepa filter friction factor
