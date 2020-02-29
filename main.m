@@ -13,13 +13,12 @@ Emax = 0; Rmax = 0;
 RCmin = 0; RCmax = 0;
 gamMin = 0; gamMax = 0;
 Rmin = 0;
-downwasheffect = 0;
 
 %% WEIGHT DISTRIBUTION
-
-Xarmarray = [];
-Zarmarray = [];
-weightarray = [];
+Xarmarray = []; % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+Zarmarray = []; % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+weightarray = []; % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+downwash = 0; %downwash effect on tail
 
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
@@ -33,82 +32,85 @@ tapw = 0; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 aoaw = 5; aoat = aoaw; %angle of attack for wing and tail
+Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
 
 %AIRCRAFT DATA
-Wb = 400; % weight of the body(minus engine) [kg] 
+Wb = 400; % weight of the body(minus engine) [kg]
 %engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 h = 1.8;       %height of aircraft (m)
 t = bw;       %approximate max horizontal thickness along the vertical (m)
 Pe = [20*10^3:5*10^3:75*10^3]; %engine power [W]
-We = [192.5:27.5:495];
+We = [192.5:27.5:495]; %engine weight
 xdivc = .7;   %chord wise position of max thickness (m)
 Swet = 0;    %wetted area (m^2) CALC AGAIN BELOW
-Df = 0;      %diameter of fuselage
+Sref = Sw;   %Reference Surface Area
+Df = 1;      %diameter of fuselage
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 sspan = 10;
-fuselageL = 10; % Length of the fuselage from tip
-noseX = 0; noseL = 1; % Position of start of nose cone from tip; Length of nose cone
-wingX = 1; wingL = c; % Position of start of wing from tip; Chord of wing
-tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail
-tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone
-tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE
+fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
+noseX = 0; noseL = 1; % Position of start of nose cone from tip; Length of nose cone USED IN INERTIAL AND NEUTRAL POINT CALC
+wingX = 1; wingL = c; % Position of start of wing from tip; Chord of wing USED IN INERTIAL AND NEUTRAL POINT CALC
+tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail USED IN INERTIAL AND NEUTRAL POINT CALC
+tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone USED IN INERTIAL AND NEUTRAL POINT CALC
+tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
-%Actual Loop Portion
-%Will iterate through several different possibilities for certain variables
-for Df = [.1:.2:1.5]
+%
     %Recalculating Swet for changing fuselage diameter
-    Swet = pi*(Df/2)^2;
-  %  for phiw = [0:1:15] %wing sweep iteration
-  %      phit = phiw;
-        for j = [1:1:length(Pe)] %engine power iteration [W]
-            W = We(j) + Wb;
-            PE = Pe(j);
-            for tapw = [0.2:0.05:0.4] %taper ratio iteration
-                tapt = tapw;
-                %Lift Call        
-                [W,Sw,St,CLw,CLt,CLa,CLwa,CLta,L,Vstall,bw,bt,Aw,At,ew,et] = lift(rho,Clw,Clt,Clwa,Clta,aoaw,aoat,ew,et,W,Vstall,Sw,St,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
-                %Getting a CL of the whole plane at stall speed for drag calc
-                dex = find(V==round(Vstall));
-                CL = CLa(dex);
-                %Drag Call
-                [Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sw,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
-                %% CG Call
-                [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
-                %% Neutral Point Call
-                [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
-                %% Static Margin Calc
-                staticmargin = XCG/c-hn;
-                %Performance Call
-                %planform surface area of plane
-                S = Sw+St; %assuming only wings provide lift
-                %robust alt. but possibly error prone
-                %S = L(1)/(.5 * arCL(1) * V(1)^2 * rho);
-                %k calc
-                kw = 1/(pi*Aw*ew);
-                [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD(dex),CDo(dex),Pav,Pr,W,Vhead,Vstall);
-                jj = find(min(D));
-                if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
-                    fprintf('Success! \n') %in case we do generate one then add portion to display variables
-                    fprintf('j =')
-                    disp(j)
-                    fprintf('tapw')
-                    disp(tapw)
-                    fprintf('Df')
-                    disp(Df)
-                    fprintf('Capacity of battery Ah')
-                    disp(C)
-                    fprintf('Sto =')
-                    disp(Sto)
-                    fprintf('Sl =')
-                    disp(Sl)
-                    pause;
-                    close all;
-                else
-                    fprintf('end of test \n') %for debug
-                    close all;
-                end
-            end
-        end
-    %end
+Swet = pi*(Df/2)^2;
+% phiw = [0:1:15] %wing sweep iteration
+%      phit = phiw;
+j = 1;
+W = We(j) + Wb;
+PE = Pe(j);
+tapt = tapw;
+
+%Lift
+[W,Sw,St,CLwa,CLta,CLw,CLt,CLwmax,CLtmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
+%Getting a CL of the whole plane at stall speed for drag calc
+dex = find(V==round(Vstall));
+CL = CLa(dex);
+
+%Drag
+[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CLa,W,Swet,Sref,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
+%Performance Call
+%planform surface area of plane
+S = Sw+St; %assuming only wings provide lift
+%robust alt. but possibly error prone
+%S = L(1)/(.5 * arCL(1) * V(1)^2 * rho);
+%k calc
+kw = 1/(pi*Aw*ew);
+
+%% CG
+[XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
+%% Neutral Point
+[hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
+%% Static Margin
+staticmargin = XCG/c-hn;
+
+%Performance
+[Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD(dex),CDo(dex),Pav,Pr,W,Vhead,Vstall);
+
+%Spec Verification
+if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
+fprintf('Success! \n') %in case we do generate one then add portion to display variables
+fprintf('j =')
+disp(j)
+fprintf('tapw')
+disp(tapw)
+fprintf('Df')
+disp(Df)
+fprintf('Capacity of battery Ah')
+disp(C)
+fprintf('Sto =')
+disp(Sto)
+fprintf('Sl =')
+disp(Sl)
+fprintf('static margin =')
+disp(staticmargin)
+pause;
+close all;
+else
+fprintf('end of test \n') %for debug
+close all;
 end
