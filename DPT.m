@@ -1,4 +1,4 @@
-function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,e,t,c,Y,CLw,CLt,xdivc,h,V)
+function[Wfilters,CDi,tdivc,Q,K,Cf,CDmisc,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,ew,et,t,c,Y,CLw,CLt,xdivc,V)
 %Use length of aircraft for c
 
 %%%154A Drag Block
@@ -9,7 +9,7 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     Tair = 339.77598;        %(K), range of 400-1700ft (121.92-518.16 m) above sea level
 %%%Aircraft Constants
 %     W = ;
-    g = 9.81;       %m/s^2
+%    g = 9.81;       %m/s^2
 %     Swet =;        %wetted area (m^2)
 %     Sref =;        %reference area. ie wing area (m^2)
 %     Aw = ;      % wing aspect ratio
@@ -30,13 +30,20 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     q = 0.5*rho*Swet*(V.^2);
     m = length(V);
 
-%% 
+%%
+CDo = zeros(n,m);
+CDi = zeros(n,m);
+CD = zeros(n,m);
+Tr = zeros(n,m);
+D = zeros(n,m);
+Di = zeros(n,m);
+Do = zeros(n,m);
 for nn = 1:n
 %%%Calculating Induced Drag Coefficient
-    CDiw = (CLw([nn],:).^2)/pi/Aw/e;      % CLw = coef. of lift of wing
-    CDit = (CLt([nn],:).^2)/pi/At/e;      % CLt = coef. of lift of tail 
+    CDiw = (CLw([nn],:).^2)/pi/Aw/ew;      % CLw = coef. of lift of wing
+    CDit = (CLt([nn],:).^2)/pi/At/et;      % CLt = coef. of lift of tail
     %%%Total Induced Drag Coefficient, CDi
-    CDi = CDiw + (St/Sw)*CDit;
+    CDi(nn,:) = CDiw + (St/Sw)*CDit;
 %%%Calculating Parasitic Drag Coefficient
     %Form Factor, K
     tdivc = t/c;        %thickness to chord ratio
@@ -78,27 +85,21 @@ for nn = 1:n
     %like the booms for example)
     CDprot = 0;
     %%%Total Parasitic Drag Coefficient, CDo
-    CDo =  K.*Q.*Cf.*(Swet/Sref)+CDmisc+CDprot; 
-%%%Total Drag  
-    CD = zeros(n,m);
-    CD([nn],:) = CDi + CDo;
-    D = q.*CD;
-    Di = q.*CDi;
-    Do = q.*CDo+Rdrag;
+    CDo(nn,:) =  K.*Q.*Cf.*(Swet/Sref)+CDmisc+CDprot+Rdrag./q;
 %%%Finding Max L/D
 %   CL([n],:) = CLw([n],:) + CLt([n],:);
-    Tr = D;         %thrust required
+    Tr(nn,:) = D(nn,:);         %thrust required
 %     figure
 %     hold on
 %     plot(CD([nn],:), CL([nn],:))
 %     plot(CD([nn],:), max(diff(CL)), '--')      %max cl/cd is at the tangent that crosses the zero (steepest tangent?
 %     legend('CL versus CD', 'Tangent of L/D')
 %     hold off
-%%%Propellor 
+%%%Propellor
     npmin = 0;
     npmax = 0.725;
-    a = [npmin:npmax];
-    np = [npmin:(npmax/(length(V)-1)):npmax];      %propellor efficiency
+    % a = [npmin:npmax];
+    np = npmin:(npmax/(length(V)-1)):npmax;      %propellor efficiency
 %     PE = 55*10^3;       %Power that the engine provides to the propellor(W)
     Pav = np.*PE;        %Power available
     Tav = Pav./V;       %thrust available
@@ -114,7 +115,7 @@ for nn = 1:n
 %     xlabel('Velocity, V (m/s)')
 %     ylabel('Power Required, Pr (W)')
 %     hold off
-%%% Plotting moved to the main    
+%%% Plotting moved to the main
 %%% Plotting Parasitic, Induced, and Total Drag
 %     figure
 %     hold on
@@ -128,4 +129,9 @@ for nn = 1:n
 %     ylabel('Force, D or T(N)')
 %     hold off
 end
+%%%Total Drag
+    CD = CDi + CDo;
+    D = q.*CD;
+    Di = q.*CDi;
+    Do = q.*CDo;
 end

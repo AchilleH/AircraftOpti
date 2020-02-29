@@ -1,4 +1,4 @@
-function [W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange,aoa)
+function [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange,aoa)
 %Lift Calculation Block,[W,Sw,St,CLwa,CLta,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)  Leave a 0 in 1 argument to have it return the design
 %value. For CL leave a 0 in Cl to have it generate CL. Df is fuselage
 %diameter and will be used to approximate e if e == 0, along with
@@ -10,23 +10,23 @@ function [W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(r
 
 %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
 if(Sw == 0 && ARw ~= 0 && bw ~= 0)
-   Sw = bw^2/ARw; 
+   Sw = bw^2/ARw;
 end
 if(Sw ~= 0 && ARw == 0 && bw ~= 0)
-   ARw = bw^2/Sw; 
+   ARw = bw^2/Sw;
 end
 if(Sw ~= 0 && ARw ~= 0 && bw == 0)
-   bw = sqrt(Sw*ARw); 
+   bw = sqrt(Sw*ARw);
 end
 
 if(St == 0 && ARt ~= 0 && bt ~= 0)
-   St = bt^2/ARt; 
+   St = bt^2/ARt;
 end
 if(St ~= 0 && ARt == 0 && bt ~= 0)
-   ARt = bt^2/St; 
+   ARt = bt^2/St;
 end
 if(St ~= 0 && ARt ~= 0 && bt == 0)
-   bt = sqrt(St*ARt); 
+   bt = sqrt(St*ARt);
 end
 if(Sref == 0)
     Sref = Sw;
@@ -57,7 +57,7 @@ end
 
 %% Getting 3d CLa and Plotting CLa over specified range
 %using equation from design textbook
-%beta = 1-M^2; % M is 
+%beta = 1-M^2; % M is
 %nu = Cla/(2*pi/beta)
 M = Vrange./343; %Mach number were c is in m/s
 beta = 1-M.^2;
@@ -140,12 +140,12 @@ end
 % %just based on the aoa of the wing(s)
 % CLt = CLta * aoat;
 % CLw = CLwa * aoaw;
-% 
+%
 % CLa = zeros(size(Vrange));
 % CLa(1:end) = CLw + St*CLt/Sw;
 % %CLa = [0:0.05:0.05*47]; uncomment to use the old CL array that produced
 % %somewhat ok drag polars
-% 
+%
 % L = .5 .* CLa .* Vrange.^2 .* rho .* (Sw+St);
 % figure(3)
 % plot(Vrange,L)

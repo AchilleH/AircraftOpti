@@ -5,17 +5,6 @@ rho = 1.18; % Air density kg/m^3
 V = [0:47];       %aircraft velocity (m/s)
 
 %% Variables
-%Variables that are assigned strictly by functions
-CLw = 0; CLt = 0;
-arCL = [];
-L = [];
-Sto = 0; Sl = 0;
-C = 0;
-Emax = 0; Rmax = 0;
-RCmin = 0; RCmax = 0;
-gamMin = 0; gamMax = 0;
-Rmin = 0;
-
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
 c = 1;       %chord of aircraft wing(m)
@@ -67,16 +56,16 @@ PE = Pe(j);
 Swet = pi*(Df/2)^2 + T*bw + T*bt;
 
 %% Lift
-[W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
+[Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
 
 %% Drag, second Swet is input for Sref in DPT
-[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
+[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
 
 %% Performance
 %planform surface area of plane
 S = Sw+St; %assuming only wings provide lift
 %k calc
-kw = 1/(pi*Aw*ew);
+kw = 1/(pi*Aw*S);
 [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
 
 %% CG
@@ -89,25 +78,28 @@ kw = 1/(pi*Aw*ew);
 staticmargin = XCG/c-hn;
 
 %% Spec Verification
-if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
-fprintf('Success! \n') %in case we do generate one then add portion to display variables
-fprintf('j =')
-disp(j)
-fprintf('tapw')
-disp(tapw)
-fprintf('Df')
-disp(Df)
-fprintf('Capacity of battery Ah')
-disp(C)
-fprintf('Sto =')
-disp(Sto)
-fprintf('Sl =')
-disp(Sl)
-fprintf('static margin =')
-disp(staticmargin)
-pause;
-close all;
-else
-fprintf('end of test \n') %for debug
-close all;
-end
+%TODO: Have a Verification Test for all concatenated data, then output histograms
+
+%Old Spec Verification
+% if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
+% fprintf('Success! \n') %in case we do generate one then add portion to display variables
+% fprintf('j =')
+% disp(j)
+% fprintf('tapw')
+% disp(tapw)
+% fprintf('Df')
+% disp(Df)
+% fprintf('Capacity of battery Ah')
+% disp(C)
+% fprintf('Sto =')
+% disp(Sto)
+% fprintf('Sl =')
+% disp(Sl)
+% fprintf('static margin =')
+% disp(staticmargin)
+% pause;
+% close all;
+% else
+% fprintf('end of test \n') %for debug
+% close all;
+% end
