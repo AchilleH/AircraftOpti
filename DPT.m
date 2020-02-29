@@ -27,6 +27,7 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     mew = 1.77907876*10^(-6);     %dynamic viscosity of fluid (N s/m^2)
     v = mew/rho;     %kinematic viscosity (m^2/s)
     Re = V.*c/v;       %reynold's number
+    q = 0.5*rho*Area*(V.^2);
 
 %%    
 %%%Calculating Induced Drag Coefficient
@@ -56,7 +57,6 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
     vel = air/60*(.3048^3)/A;  %inlet velocity in m/s
     mdot = rho*A*vel;
     Rdrag = mdot*vel;
-%     q = 0.5*rho*Sref*(V.^2);
 %     CDleak = Rdrag/q;
 %%old CDleak calculation (resulted in 10^6 drag)
 %     fricfrac1 = 0.28;   %prefilter friction factor
@@ -88,7 +88,6 @@ function[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,
 
 %%%Total Drag  
     CD = CDi + CDo;
-    q = 0.5*rho*Sref*(V.^2);
     D = q.*CD;
     Di = q.*CDi;
     Do = q.*CDo;
