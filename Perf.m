@@ -1,4 +1,4 @@
-function [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin] = Perf(rho,T,V,D,S,L,k,nu,Clg,Cdg,Cdo,Pav,Preq,W,Vhead,Vstall)
+function [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin] = Perf(rho,T,V,D,S,L,k,nu,Clg,Cdg,Cdo,Pav,Preq,W,Vhead)
 %general Performance notes
 %Tr = W/(L/D)
 %Pr = Tr*V = D * V
@@ -12,6 +12,7 @@ function [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin] = Perf(rho,T,V,D,S
 
 %Below are Variable values used/assumptions made
 g = 9.81; %metric g
+Vstall = 
 Vlof = 1.1*Vstall;
 Vtd = 0.7*Vstall;
 Va = 1.3*Vstall;

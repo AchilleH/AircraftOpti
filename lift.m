@@ -1,4 +1,4 @@
-function [W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)
+function [W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange,aoa)
 %Lift Calculation Block,[W,Sw,St,CLwa,CLta,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)  Leave a 0 in 1 argument to have it return the design
 %value. For CL leave a 0 in Cl to have it generate CL. Df is fuselage
 %diameter and will be used to approximate e if e == 0, along with
@@ -7,8 +7,6 @@ function [W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(r
 %Leave a 0 in Cla to have it not generate a lift polar.
 
 %e = 0.7 for rect, 1 for ellipse or taper of ~0.3-0.4
-
-aoa = [-8:1:8];
 
 %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
 if(Sw == 0 && ARw ~= 0 && bw ~= 0)
