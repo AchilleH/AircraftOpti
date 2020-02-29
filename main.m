@@ -1,8 +1,10 @@
 clc; clear; close all;
 
-%CONSTANTS
+%% CONSTANTS
 rho = 1.18; % Air density kg/m^3
 V = [0:47];       %aircraft velocity (m/s)
+
+%% Variables
 %Variables that are assigned strictly by functions
 CLw = 0; CLt = 0;
 arCL = [];
@@ -13,8 +15,7 @@ Emax = 0; Rmax = 0;
 RCmin = 0; RCmax = 0;
 gamMin = 0; gamMax = 0;
 Rmin = 0;
-
-%% WEIGHT DISTRIBUTION
+% WEIGHT DISTRIBUTION
 Xarmarray = []; % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
 Zarmarray = []; % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
 weightarray = []; % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
@@ -57,32 +58,36 @@ tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail USED I
 tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone USED IN INERTIAL AND NEUTRAL POINT CALC
 tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
+%% Calculation Control
 j = 1; %var to control engine choice
 W = Wb + We(j);
 PE = Pe(j);
 %Recalculating Swet for changing fuselage diameter
 Swet = pi*(Df/2)^2 + T*bw + T*bt;
 
-%Lift
+%% Lift
 [W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
 
-%Drag, second Swet is input for Sref in DPT
+%% Drag, second Swet is input for Sref in DPT
 [Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
-%Performance Call
+
+%% Performance
 %planform surface area of plane
 S = Sw+St; %assuming only wings provide lift
 %k calc
 kw = 1/(pi*Aw*ew);
-%Performance
 [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
 
 %% CG
 [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
+
 %% Neutral Point
 [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
+
 %% Static Margin
 staticmargin = XCG/c-hn;
-%Spec Verification
+
+%% Spec Verification
 if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
 fprintf('Success! \n') %in case we do generate one then add portion to display variables
 fprintf('j =')
