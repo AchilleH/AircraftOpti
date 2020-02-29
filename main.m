@@ -15,11 +15,6 @@ Emax = 0; Rmax = 0;
 RCmin = 0; RCmax = 0;
 gamMin = 0; gamMax = 0;
 Rmin = 0;
-% WEIGHT DISTRIBUTION
-Xarmarray = []; % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
-Zarmarray = []; % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
-weightarray = []; % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
-downwash = 0; %downwash effect on tail
 
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
@@ -35,6 +30,7 @@ bw = 10.5; bt = bw/2; %Wingspans
 aoaw = 5; aoat = aoaw; %angle of attack for wing and tail
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
 T = 0.1*c; %Airfoil thickness
+aoarange = -8:1:8; %range of aoa to evaluate over
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
@@ -57,6 +53,11 @@ wingX = 1; wingL = c; % Position of start of wing from tip; Chord of wing USED I
 tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail USED IN INERTIAL AND NEUTRAL POINT CALC
 tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone USED IN INERTIAL AND NEUTRAL POINT CALC
 tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
+% WEIGHT DISTRIBUTION
+Xarmarray = []; % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+Zarmarray = []; % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+weightarray = []; % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+downwash = 0; %downwash effect on tail
 
 %% Calculation Control
 j = 1; %var to control engine choice
@@ -66,7 +67,7 @@ PE = Pe(j);
 Swet = pi*(Df/2)^2 + T*bw + T*bt;
 
 %% Lift
-[W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
+[W,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
 
 %% Drag, second Swet is input for Sref in DPT
 [Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
