@@ -1,9 +1,5 @@
-function [W,Sw,St,CLwa,CLta,CLw,CLt,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)
+function [W,Sw,St,CLwa,CLta,CLw,CLt,CLwmax,CLtmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)
 %Lift Calculation Block,[W,Sw,St,CLwa,CLta,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)  Leave a 0 in 1 argument to have it return the design
-%TODO
-%Edit CLa area to use new Mach dependent formula
-%Add Sref and sweep angle inputs
-%
 %value. For CL leave a 0 in Cl to have it generate CL. Df is fuselage
 %diameter and will be used to approximate e if e == 0, along with
 %tap(taper). phi is sweep angle measured from the horizontal. Assiming V of < 333 ft/s and general aviation
@@ -11,7 +7,7 @@ function [W,Sw,St,CLwa,CLta,CLw,CLt,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,C
 %Leave a 0 in Cla to have it not generate a lift polar.
 
 %e = 0.7 for rect, 1 for ellipse or taper of ~0.3-0.4
-aoa = [-12:1:12];
+aoa = [-8:1:8];
 
 %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
 if(Sw == 0 && ARw ~= 0 && bw ~= 0)
@@ -38,7 +34,7 @@ if(Sref == 0)
 end
 
 %% Assigning e
-if(ew == 0 && bw ~= 0 && tapw ~= 0 && ARw ~= 0 && Df ~= 0)
+if(bw ~= 0 && ARw ~= 0 && Df ~= 0)
     dtap = -0.357 + 0.45*exp(0.0375*phiw);
     tap = tapw - dtap;
     f = 0.0524*tap^4 - 0.15*tap^3 + 0.1659*tap^2 - 0.0706*tap + 0.0119;
@@ -49,7 +45,7 @@ else
     ew = 0.7;
 end
 
-if(et == 0 && bt ~= 0 && tapt ~= 0 && ARt ~= 0 && Df ~= 0)
+if(bt ~= 0 && ARt ~= 0 && Df ~= 0)
     dtap = -0.357 + 0.45*exp(0.0375*phit);
     tap = tapt - dtap;
     f = 0.0524*tap^4 - 0.15*tap^3 + 0.1659*tap^2 - 0.0706*tap + 0.0119;
@@ -79,12 +75,14 @@ CLt = meshgrid(Clta,aoa);
 Lw = meshgrid(qw,aoa);
 Lt = meshgrid(qt,aoa);
 
-    for I = 1:size(aoa)
-     CLw([I],:) = CLw([I],:) * aoa(I);
-     CLt([I],:) = CLt([I],:) * aoa(I);
-     Lw([I],:) = Lw([I],:) .* CLw([I],:);
-     Lt([I],:) = Lt([I],:) .* CLw([I],:);
+    for I = 1:length(aoa)
+     CLw(I,:) = CLw(I,:) * aoa(I) + Clwo;
+     CLt(I,:) = CLt(I,:) * aoa(I) + Clto;
+     Lw(I,:) = Lw(I,:) .* CLw(I,:);
+     Lt(I,:) = Lt(I,:) .* CLw(I,:);
     end
+    CLwmax = CLw(length(aoa),:);
+    CLtmax = CLt(length(aoa),:);
 end
 
 

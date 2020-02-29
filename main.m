@@ -27,6 +27,7 @@ tapw = 0; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 aoaw = 5; aoat = aoaw; %angle of attack for wing and tail
+Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
@@ -54,7 +55,7 @@ PE = Pe(j);
 tapt = tapw;
 
 %Lift
-[W,Sw,St,CLwa,CLta,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
+[W,Sw,St,CLwa,CLta,CLw,CLt,CLwmax,CLtmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,W,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V);
 %Getting a CL of the whole plane at stall speed for drag calc
 dex = find(V==round(Vstall));
 CL = CLa(dex);
