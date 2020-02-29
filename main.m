@@ -59,7 +59,11 @@ Swet = pi*(Df/2)^2 + T*bw + T*bt;
 [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
 
 %% Drag, second Swet is input for Sref in DPT
+<<<<<<< HEAD
 [Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
+=======
+[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(length(aoa),PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
+>>>>>>> 8fdd1c9c2dd09bc6e796b8841950b0c9dc44c8f2
 
 %% Performance
 %planform surface area of plane
