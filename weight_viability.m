@@ -1,4 +1,4 @@
-function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,AR, S, Sh, Sv, bh, bv, taper_ratio, V_max)
+function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio, V_max)
 
 
 % W = 50; 
@@ -78,10 +78,10 @@ Wstruct=Ww+Wf+Wht+Wvt+Wlg;
 
 %% Total Propulsion Unit (minus Fuel system) Weight
 
-Weng=100; %(lbs)     %Bare Engine Weight
+Weng=We; %(lbs)     %Bare Engine Weight
 Neng=1;             %# Engines
 
-Wp=2.575*(Weng)^0.922*Neng;    %this equation likely over-estimates propulsion unit weight for a small UAV
+We=2.575.*(Weng).^0.922.*Neng;    %this equation likely over-estimates propulsion unit weight for a small UAV
 
 
 %% Fuel Weight
