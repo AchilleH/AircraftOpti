@@ -23,15 +23,20 @@ aoarange = -8:1:8; %range of aoa to evaluate over
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
+ModNum = 26;    %Num of modules needed to filter 10^6 cf2h based on modules capable of 330cfm
+Wprefilter = 1.2224;
+Wcarbonfilter = 2.5;
+Whyperhepafilter = 2.1044;
+Wfilters = ModNum*(Wprefilter+Wcarbonfilter+Whyperhepafilter); %weight of all filters in kg
 %engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 h = 1.8;       %height of aircraft (m)
-t = bw;       %approximate max horizontal thickness along the vertical (m)
 Pe = [20*10^3:5*10^3:75*10^3]; %engine power [W]
 We = [192.5:27.5:495]; %engine weight
 xdivc = .7;   %chord wise position of max thickness (m)
 Swet = 0;    %wetted area (m^2) CALC AGAIN BELOW
 Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
+t = Df; %approximate max horizontal thickness along the vertical (m)
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 %Stability Specific Variables
@@ -50,27 +55,24 @@ downwash = 0; %downwash effect on tail
 
 %% Calculation Control
 j = 1; %var to control engine choice
-W = Wb + We(j);
-PE = Pe(j);
+W = Wb + We(j) + Wfilters; %Total Weight
+PE = Pe(j); %engine power
+C = 0; %Battery Capacity
 %Recalculating Swet for changing fuselage diameter
 Swet = pi*(Df/2)^2 + T*bw + T*bt;
+%planform surface area of plane
+S = Sw+St; %assuming only wings provide lift
+%k calc for performance
+k = 1/(pi*Aw*S);
 
 %% Lift
 [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
 
 %% Drag, second Swet is input for Sref in DPT
-<<<<<<< HEAD
-[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
-=======
-[Wfilters,CDiw,CDit,CDi,tdivc,Q,K,Cf,CDmisc,CDleak,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(length(aoa),PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,t,c,phiw,CLw,CLt,xdivc,h,V);
->>>>>>> 8fdd1c9c2dd09bc6e796b8841950b0c9dc44c8f2
+[CDiw,CDit,CDi,tdivc,Q,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
 
 %% Performance
-%planform surface area of plane
-S = Sw+St; %assuming only wings provide lift
-%k calc
-kw = 1/(pi*Aw*S);
-[Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin] = Perf(rho,Tav,V,D,S,L,kw,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
+[Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
 
 %% CG
 [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);

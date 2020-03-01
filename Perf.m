@@ -1,4 +1,4 @@
-function [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin] = Perf(rho,T,V,D,S,L,k,nu,Clg,Cdg,Cdo,Pav,Preq,W,Vhead)
+function [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin,Vstall] = Perf(n,C,rho,T,V,D,S,L,k,nu,Clg,Cdg,Cdo,Pav,Preq,W,Vhead)
 %general Performance notes
 %Tr = W/(L/D)
 %Pr = Tr*V = D * V
@@ -10,9 +10,23 @@ function [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin] = Perf(rho,T,V,D,S
 %it's lifespan
 %C is battery capacity in ampere hours
 
-%Below are Variable values used/assumptions made
+%Constants and Preallocation
 g = 9.81; %metric g
-Vstall = 
+Vstall = zeros(1,n);
+Sto = zeros(1,n);
+Sl = zeros(1,n);
+C = zeros(1,n);
+Emax = zeros(1,n);
+Rmax = zeros(1,n);
+RCmin = zeros(1,n);
+RCmax = zeros(1,n);
+gamMin = zeros(1,n);
+gamMax = zeros(1,n);
+TRmin = zeros(1,n);
+
+for i = 1:n
+    %for loop to handle row by row calculations using matrix inputs
+Vstall(n) = V(find(L>=W));
 Vlof = 1.1*Vstall;
 Vtd = 0.7*Vstall;
 Va = 1.3*Vstall;

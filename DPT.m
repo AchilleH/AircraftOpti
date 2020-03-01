@@ -1,4 +1,4 @@
-function[Wfilters,CDi,tdivc,Q,K,Cf,CDmisc,CDprot,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,ew,et,t,c,Y,CLw,CLt,xdivc,V)
+function[CDi,tdivc,Q,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,ew,et,t,c,Y,CLw,CLt,xdivc,V)
 %Use length of aircraft for c
 
 %%%154A Drag Block
@@ -74,13 +74,6 @@ for nn = 1:n
 %     FilterSA2 = 3.894;  %Carbon filter surface area in m^2
 %     FilterSA3 = 4.924;  %HyperHepa filter surface area in m^2
 %     SingleModuleSA = FilterSA1+FilterSA2+FilterSA3; %total surface area of one module (3 air filters) in m^2
-      ModNum = 26;    %Num of modules needed to filter 10^6 cf2h based on modules capable of 330cfm
-%     ModuleSA = SingleModuleSA*ModNum;   %surface area of all filters in the body (m^2)
-%     CDleak = CDleakpercubicmeter*ModuleSA;  %leakage drag for all modules
-    Wprefilter = 1.2224;
-    Wcarbonfilter = 2.5;
-    Whyperhepafilter = 2.1044;
-    Wfilters = ModNum*(Wprefilter+Wprefilter+Whyperhepafilter); %weight of all filters in kg
     %Protuberance Drag, CDprot (due to things that stick out of the body,
     %like the booms for example)
     CDprot = 0;
