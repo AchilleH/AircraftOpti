@@ -2,21 +2,19 @@ clc; clear; close all;
 
 %% CONSTANTS
 rho = 1.18; % Air density kg/m^3
-V = [0:47];       %aircraft velocity (m/s)
+V = 0:47;       %aircraft velocity (m/s)
 
 %% Variables
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
 c = 1;       %chord of aircraft wing(m)
-Clw = 1.2; Clwa = 0.1; %WING 2d lift coefficient and vs alpha
-Clt = Clw; Clta = Clwa; % TAIL 2d lift coef. and vs alpha
-ew = 0; et = ew; %Oswald's for wing and tail
+Clwa = 0.1; %WING 2d lift coefficient and vs alpha
+Clta = Clwa; % TAIL 2d lift coef. and vs alpha
 Aw = 11; At = Aw; % WING & TAIL aspect ratio
 Sw = 0; St = 0;     % WING & TAIL planform area (m^2)
 tapw = 0; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
-aoaw = 5; aoat = aoaw; %angle of attack for wing and tail
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
 T = 0.1*c; %Airfoil thickness
 aoarange = -8:1:8; %range of aoa to evaluate over
@@ -30,10 +28,9 @@ Whyperhepafilter = 2.1044;
 Wfilters = ModNum*(Wprefilter+Wcarbonfilter+Whyperhepafilter); %weight of all filters in kg
 %engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 h = 1.8;       %height of aircraft (m)
-Pe = [20*10^3:5*10^3:75*10^3]; %engine power [W]
-We = [192.5:27.5:495]; %engine weight
+Pe = 20*10^3:5*10^3:75*10^3; %engine power [W]
+We = 192.5:27.5:495; %engine weight
 xdivc = .7;   %chord wise position of max thickness (m)
-Swet = 0;    %wetted area (m^2) CALC AGAIN BELOW
 Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
 t = Df; %approximate max horizontal thickness along the vertical (m)
@@ -69,7 +66,7 @@ k = 1/(pi*Aw*S);
 [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
 
 %% Drag, second Swet is input for Sref in DPT
-[CDiw,CDit,CDi,tdivc,Q,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
+[CDi,Q,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
 
 %% Performance
 [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);

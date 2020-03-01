@@ -1,4 +1,4 @@
-function[CDi,tdivc,Q,CDo,CD,q,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,ew,et,t,c,Y,CLw,CLt,xdivc,V)
+function[CDi,Q,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,ew,et,t,c,Y,CLw,CLt,xdivc,V)
 %Use length of aircraft for c
 
 %%%154A Drag Block
