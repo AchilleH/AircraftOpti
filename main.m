@@ -83,6 +83,16 @@ k = 1/(pi*Aw*S);
 %% Static Margin
 staticmargin = XCG/c-hn;
 
+%% Wing, Engine, Fuselage Inertias
+[Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
+[Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
+[Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
+Ixarray = [Ixw,Ixe, Ixf];
+Iyarray = [Iyw, Iye, Iyf];
+Izarray = [Izw, Ize, Izf];
+Ixzarray = [Ixzw, Ixze, Ixzf];
+[Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
+
 %% Spec Verification
 %TODO: Have a Verification Test for all concatenated data, then output histograms
 
