@@ -48,7 +48,7 @@ W_guess= 200;
 W_avionics = 10;
 W_landgear = 10;
 % Niccolai Weight Esimations
-[W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess,Wfilters,W_avionics,W_landgear,We,Aw,Sw,St,St,bt,bt,tapw,V_max);
+[W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess,Wfilters,W_avionics,W_landgear,We,Aw,Sw,St,St,bt,bt,tapw,T/c,V_max);
 nosearr = [0 0 10];
 avioarr = [13 0 W_avionics];
 filtarr = [16 0 Wfilters];
@@ -68,7 +68,7 @@ tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE
 
 %% Calculation Control
 j = 1; %var to control engine choice
-W = Wb + We(j) + Wfilters; %Total Weight
+W = Wb + We(j) + Wfilters; %Total Weight TODO:Fix niccolai implementation and incorporate that into this sum
 PE = Pe(j); %engine power
 C = 0; %Battery Capacity
 %Recalculating Swet for changing fuselage diameter

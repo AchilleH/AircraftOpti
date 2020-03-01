@@ -1,9 +1,10 @@
-function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio, V_max)
+function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio,tc,V_max)
 
-
+n = 10;
+Wto = zeros(1,n);
 % W = 50;
 
-for i = 1:10
+for i = 1:n
 Wto(i) = W;
 
 
