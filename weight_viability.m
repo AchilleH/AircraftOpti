@@ -1,23 +1,23 @@
 function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio, V_max)
 
 
-% W = 50; 
+% W = 50;
 
 for i = 1:10
 Wto(i) = W;
 
 
 
-% S = 7.12;     % 
-% 
+% S = 7.12;     %
+%
 % S = 18; %W/(.5*.00238*60^2 * 1.2 );
-% 
+%
 % A = 8.68;
-% Sh = 3.63;    
+% Sh = 3.63;
 % Sv = 1.51;
 % bh = 3.88;
 % bv = 1.62;
-% 
+%
 
 hac = 0.25;
 c = 0.91;
@@ -34,7 +34,7 @@ hacv = 0.25;
 N=6.6;              %Ultimate Load Factor (1.5 times limit load factor)(GIVEN)
 Delta=0*pi/180;%Deg %Wing 1/4 chord sweep angle
 tr=taper_ratio;               %Taper Ratio
-tc=0.12;            %Maximum Thickness Ratio (GIVEN)
+             %Maximum Thickness Ratio (input)
 Ve=V_max;%kts         %Equivalent Vmax at SL
 
 Ww=96.948*((W*N/10^5)^0.65*(AR/cos(Delta))^0.57*(S/100)^0.61*((1+tr)/(2*tc))^0.36*(1+Ve/500)^0.5)^0.993;
@@ -68,7 +68,7 @@ Wvt= (2)*  98.5*((W*N/10^5)^0.87*(  (.5)*  Sv/100)^1.2*(  (.5)*  bv/tvr)^0.5)^0.
 %Nland=2;        %Ultimate Load Factor at Wland
 %Wlg=0.054*(Llg)^0.501*(W*Nland)^0.684
 
-%don't need niccolai if we have specific landing gear 
+%don't need niccolai if we have specific landing gear
 Wlg = W_landgear;
 
 %% TOTAL STRUCTURAL WEIGHT
@@ -86,7 +86,7 @@ We=2.575.*(Weng).^0.922.*Neng;    %this equation likely over-estimates propulsio
 
 %% Fuel Weight
 
-Wfu = 50;   %(lbs)  
+Wfu = 50;   %(lbs)
 
 %% Fuel System Weight
 
@@ -100,7 +100,7 @@ Wfu = 50;   %(lbs)
 
 %% Surface Controls Weight
 
-Wsc=1.066*W^0.626;  
+Wsc=1.066*W^0.626;
 
 %% Avionics Weight - use weights of specific sensors you choose
 
