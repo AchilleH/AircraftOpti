@@ -1,4 +1,4 @@
-function [Ix, Iy, Iz, Ixz] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG)
+function [Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG)
 
 % Lam_l = sweep of leading edge
 % Lam_t = sweep of trailing edge
@@ -56,9 +56,9 @@ XS1 = (-C_a^2+C_b^2+C_c*C_b+C_c^2)/(3*(C_b+C_c-C_a))*sqrt(K_0);
 
 YS1 = b^2/V*((t_r*(c/2+b/3*(tan(Lam_t)-tan(Lam_l)))-(t_r-t_t)*(c/3+b/4*(tan(Lam_t)-tan(Lam_l)))));
 
-Ix = I_1x-W_w*(YS1dot)^2+W_w*(YS1dot+YS4)^2;
-Iy = I_1y-W_w*(XS1)^2+W_w*(XS1+XS4)^2;
-Iz = I_1z-W_w*(XS1^2+YS1dot^2)+W_w*(XS1+XS4)^2+W_w*(YS1dot+YS4)^2;
-Ixz = 0;
+Ixw = I_1x-W_w*(YS1dot)^2+W_w*(YS1dot+YS4)^2;
+Iyw = I_1y-W_w*(XS1)^2+W_w*(XS1+XS4)^2;
+Izw = I_1z-W_w*(XS1^2+YS1dot^2)+W_w*(XS1+XS4)^2+W_w*(YS1dot+YS4)^2;
+Ixzw = 0;
 
 end
