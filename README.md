@@ -8,4 +8,4 @@ TODO:
 - Change from iterative to rand inputs
 - Create array of Aircraft structs to store trial data
 - Plot histograms of trial data, success rate hist and fail hist
-
+- niccolai script needs to have inputs that line up with design variables in main
