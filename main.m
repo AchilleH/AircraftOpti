@@ -49,7 +49,7 @@ fusearr = [20 0 98.85];
 htailarr = [33 0 5.416];
 engarr = [32 0 We];
 vtailarr = [33 0 3.2625];
-wing = [12 0 125.45];
+wingarr = [12 0 125.45];
 % Order:                     avionics                     fueselage                      engine                           wing
 Xarmarray =   [ nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)];      % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
 Zarmarray =   [ nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)];          % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
