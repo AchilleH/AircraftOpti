@@ -39,18 +39,24 @@ Vhead = 0; %headwind
 %Stability Specific Variables
 sspan = 10;
 fuselageL = 33; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
-noseX = 0; noseL = 1; % Position of start of nose cone from tip; Length of nose cone USED IN INERTIAL AND NEUTRAL POINT CALC
-wingX = 1; wingL = c; % Position of start of wing from tip; Chord of wing USED IN INERTIAL AND NEUTRAL POINT CALC
-tailX = 8; tailL = c; % Position of start of tail from tip; Chord of tail USED IN INERTIAL AND NEUTRAL POINT CALC
-tailconeX = 9; tailconeL = 1; % Position of start of tail cone from tip; Chord of tail cone USED IN INERTIAL AND NEUTRAL POINT CALC
-tailac = wingX-tailX-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
+
 % WEIGHT DISTRIBUTION
-% Order:              avionics             fueselage             engine                wing
-Xarmarray =   [ 1     13       16          20         33         32       33           12];         % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
-Zarmarray =   [ 0     0        0           0          0          0        0            0];          % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
-weightarray = [ 10    10       Wfilters    98.85      5.4176     We       3.2625       125.45];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
-% Order:        nose          filters                h. tail             vertical tail
+% Order: x position, z position, weight
+nosearr = [0 0 10];
+avioarr = [13 0 10];
+filtarr = [16 0 Wfilters];
+fusearr = [20 0 98.85];
+htailarr = [33 0 5.416];
+engarr = [32 0 We];
+vtailarr = [33 0 3.2625];
+wing = [12 0 125.45];
+% Order:                     avionics                     fueselage                      engine                           wing
+Xarmarray =   [ nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)];      % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+Zarmarray =   [ nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)];          % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+weightarray = [ nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+% Order:        nose                        filters                      h. tail                         vertical tail
 downwash = 0; %downwash effect on tail
+tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
 %% Calculation Control
 j = 1; %var to control engine choice
