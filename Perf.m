@@ -1,4 +1,4 @@
-function [Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin,Vstall] = Perf(n,C,rho,T,V,D,S,L,k,nu,Clg,Cdg,Cdo,Pav,Preq,W,Vhead)
+function [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,TRmin,Vstall] = Perf(n,C,rho,T,V,D,S,L,k,nu,Clg,Cdg,Cdo,Pav,Preq,W,Vhead)
 %general Performance notes
 %Tr = W/(L/D)
 %Pr = Tr*V = D * V
@@ -15,7 +15,6 @@ g = 9.81; %metric g
 Vstall = zeros(1,n);
 Sto = zeros(1,n);
 Sl = zeros(1,n);
-C = zeros(1,n);
 Emax = zeros(1,n);
 Rmax = zeros(1,n);
 RCmin = zeros(1,n);
@@ -26,7 +25,7 @@ TRmin = zeros(1,n);
 
 for i = 1:n
     %for loop to handle row by row calculations using matrix inputs
-Vstall(n) = V(find(L>=W));
+Vstall(i) = V(find(L>=W));
 Vlof = 1.1*Vstall;
 Vtd = 0.7*Vstall;
 Va = 1.3*Vstall;
@@ -43,18 +42,17 @@ mu = 0.35; %hard braking friction
 q = .5.*rho.*V.^2.*S;
 Rt = 1; %For Ah batteries rated over 1 hour.
 n = 1.3; %Typical Lithium Polymer battery value
-C = 0; %this program will generate batt capacity that satisfies endurance spec
 
 
 %Climbing Performance
 %maybe take array inputs to get a spectrum and with it our min and max
 %Cl(maxRC) = sqrt(3*Cdo*pi*AR*e); %For Propeller Aircraft
 RC = (Pav(in4:end) - Preq(in4:end))./W;
-RCmin = min(RC);
-RCmax = max(RC);
+RCmin(i) = min(RC);
+RCmax(i) = max(RC);
 gam = (Pav(in4:end) - Preq(in4:end))./(W.*V(in4:end));
-gamMin = min(gam);
-gamMax = max(gam);
+gamMin(i) = min(gam);
+gamMax(i) = max(gam);
 
 %To/L
 %Sg is Ground roll for lift off, denominator is evaluated at V = 0.7Vlof
@@ -64,27 +62,23 @@ gamMax = max(gam);
 %TO and landing calc not working, TO goest to inf, landing hovers around 0
 Sg = ((Vlof - Vhead)^2 / (2*g*(T1/W - mu - (Cdg - mu*Clg)*q(in1)/(W/S))));
 Sa = W / (T1 - 0.01*D1) * floor((V2^2 - Vlof^2)/(2*g) + 15.24); %Relies on faa screen height converted to meters
-Sto = abs(Sg) + abs(Sa);
+Sto(i) = abs(Sg) + abs(Sa);
 
 %landing, a is avg acceleration at 0.7Vtd
 a = T3-D3-mu*(W-L3); %use
 Slg = (Vtd - Vhead)^2/(2*a);
 Sa = W / (T2-D2) * floor((Va^2 - Vtd^2)/(2*g) + 15.24); %15.24 is faa screen height in meters
-Sl = abs(Slg) + abs(Sa);
+Sl(i) = abs(Slg) + abs(Sa);
 
 %Endurance and Range
 %metric units, km for distance
 %t = Rt/i^n *(c/Rt)^n; %battery endurance
-Emax = 0;
-while(Emax < 2.5)
-Emax = Rt^(1-n)*((nu(in4)*Vstall*C)/((2/sqrt(rho*S))*Cdo^.25*(2*W*sqrt(k/3)^1.5)))^n;
-C = C+.1;
-end
-Rmax = Rt^(1-n)*(nu(in4)*Vstall*C/((2/sqrt(rho*S))*Cdo^.25*(2*W*sqrt(k)^1.5)))^n * sqrt(2*W/(rho*S) * sqrt(k/Cdo)) * 3.6;
+Emax(i) = Rt^(1-n)*((nu(in4)*Vstall*C)/((2/sqrt(rho*S))*Cdo^.25*(2*W*sqrt(k/3)^1.5)))^n;
+Rmax(i) = Rt^(1-n)*(nu(in4)*Vstall*C/((2/sqrt(rho*S))*Cdo^.25*(2*W*sqrt(k)^1.5)))^n * sqrt(2*W/(rho*S) * sqrt(k/Cdo)) * 3.6;
 
 %Turning
 %nlc = .5*rho*V^2 * (Clmax/(W/S)); %lift constrained load factor
 n = L./W; %fyi
 R = 2.*q./(g.*rho.*sqrt(n.^2 - 1));
-TRmin = min(R);
+TRmin(i) = min(R);
 end
