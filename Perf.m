@@ -26,11 +26,11 @@ gamMax = zeros(1,n);
 TRmin = zeros(1,n);
 
 %for loop to handle row by row calculations using matrix inputs
-    for i = 1:n
+    for i = 1:n %Iterates through the length of aoarange in main(rows)
         i_stall = 1;
         while 1==1
-            L = L(n,i_stall);
-            if (L>=W)
+            CompL = L(i,i_stall);
+            if (CompL>=W)
                 break;
             elseif i_stall==length(V)
                 i_stall=1;
@@ -39,19 +39,19 @@ TRmin = zeros(1,n);
             i_stall = i_stall+1;
         end
         Vstall(i) = V(i_stall);
-        Vlof = 1.1*Vstall;
-        Vtd = 0.7*Vstall;
-        Va = 1.3*Vstall;
-        V2 = 1.2*Vstall;
-        in1 = find(V==round(1.1*Vstall)); %gets the index of the closest V for avg takeoff V
-        in2 = find(V==round(1.25*Vstall)); %same but landing
+        Vlof = 1.1*Vstall(i);
+        Vtd = 0.7*Vstall(i);
+        Va = 1.3*Vstall(i);
+        V2 = 1.2*Vstall(i);
+        in1 = find(V==round(1.1*Vstall(i))); %gets the index of the closest V for avg takeoff V
+        in2 = find(V==round(1.25*Vstall(i))); %same but landing
         in3 = find(V==round(0.7*Vtd)); %for touchdown acceleration assumption
-        T1 = T(i,in1); D1 = T(i,in1);
-        T2 = T(i,in2); D2 = D(i,in2);
-        T3 = T(i,in3); D3 = D(i,in3); L3 = L(i,in3);
+        T1 = T(in1); D1 = D(i,in1);
+        T2 = T(in2); D2 = D(i,in2);
+        T3 = T(in3); D3 = D(i,in3); L3 = L(i,in3);
 
         mu = 0.35; %hard braking friction
-        q = .5.*rho.*V(i,:).^2.*S;
+        q = .5.*rho.*V.^2.*S;
         Rt = 1; %For Ah batteries rated over 1 hour.
         n = 1.3; %Typical Lithium Polymer battery value
 
@@ -59,10 +59,10 @@ TRmin = zeros(1,n);
         %Climbing Performance
         %maybe take array inputs to get a spectrum and with it our min and max
         %Cl(maxRC) = sqrt(3*Cdo*pi*AR*e); %For Propeller Aircraft
-        RC = (Pav(i,i_stall:end) - Preq(i,i_stall:end))./W;
+        RC = (Pav(i_stall:end) - Preq(i_stall:end))./W;
         RCmin(i) = min(RC);
         RCmax(i) = max(RC);
-        gam = (Pav(i,i_stall:end) - Preq(i,i_stall:end))./(W.*V(i_stall:end));
+        gam = (Pav(i_stall:end) - Preq(i_stall:end))./(W.*V(i_stall:end));
         gamMin(i) = min(gam);
         gamMax(i) = max(gam);
 
@@ -72,26 +72,26 @@ TRmin = zeros(1,n);
         %Vlof is 1.1*Vmu, Vmu is the min speed aircraft could TO w/o stiking tail
         %on ground
         %TO and landing calc not working, TO goest to inf, landing hovers around 0
-        Sg = ((Vlof - Vhead)^2 / (2*g*(T1/W - mu - (Cdg - mu*Clg)*q(in1)/(W/S))));
-        Sa = W / (T1 - 0.01*D1) * floor((V2^2 - Vlof^2)/(2*g) + 15.24); %Relies on faa screen height converted to meters
+        Sg = ((Vlof - Vhead)^2 ./ (2*g*(T1./W - mu - (Cdg(i,i_stall) - mu*Clg(i,i_stall)).*q(in1)./(W./S))));
+        Sa = W ./ (T1 - 0.01.*D1) .* floor((V2.^2 - Vlof.^2)./(2.*g) + 15.24); %Relies on faa screen height converted to meters
         Sto(i) = abs(Sg) + abs(Sa);
 
         %landing, a is avg acceleration at 0.7Vtd
-        a = T3-D3-mu*(W-L3); %use
-        Slg = (Vtd - Vhead)^2/(2*a);
-        Sa = W / (T2-D2) * floor((Va^2 - Vtd^2)/(2*g) + 15.24); %15.24 is faa screen height in meters
+        a = T3-D3-mu.*(W-L3); %use
+        Slg = (Vtd - Vhead).^2./(2.*a);
+        Sa = W ./ (T2-D2) .* floor((Va.^2 - Vtd.^2)/(2.*g) + 15.24); %15.24 is faa screen height in meters
         Sl(i) = abs(Slg) + abs(Sa);
 
         %Endurance and Range
         %metric units, km for distance
         %t = Rt/i^n *(c/Rt)^n; %battery endurance
-        Emax(i) = Rt^(1-n)*((nu(i_stall)*Vstall*C)/((2/sqrt(rho*S))*Cdo^.25*(2*W*sqrt(k/3)^1.5)))^n;
-        Rmax(i) = Rt^(1-n)*(nu(i_stall)*Vstall*C/((2/sqrt(rho*S))*Cdo^.25*(2*W*sqrt(k)^1.5)))^n * sqrt(2*W/(rho*S) * sqrt(k/Cdo)) * 3.6;
+        Emax(i) = Rt^(1-n)*((nu(i_stall)*Vstall(i)*C)/((2/sqrt(rho*S))*Cdo(i,i_stall)^.25*(2*W*sqrt(k/3)^1.5)))^n;
+        Rmax(i) = Rt^(1-n)*(nu(i_stall)*Vstall(i)*C/((2/sqrt(rho*S))*Cdo(i,i_stall)^.25*(2*W*sqrt(k)^1.5)))^n * sqrt(2*W/(rho*S) * sqrt(k/Cdo(i,i_stall))) * 3.6;
 
         %Turning
         %nlc = .5*rho*V^2 * (Clmax/(W/S)); %lift constrained load factor
-        n = L./W; %fyi
-        R = 2.*q./(g.*rho.*sqrt(n.^2 - 1));
+        n = L(i,i_stall:end)./W; %fyi
+        R = 2.*q(i_stall:end)./(g.*rho.*sqrt(n.^2 - 1));
         TRmin(i) = min(R);
     end
 end

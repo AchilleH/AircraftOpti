@@ -67,7 +67,7 @@ W_landgear = 10;
 
 %Trial Variables to Save data
 n = 50; %number of trials to run
-Data = zeros(1,n); %length n row vector to store aircraft struct data for each trial
+ %Can't seem to find a way to preallocate for structs
 
 %The Loop to calculate all our data
 for i = 1:n
@@ -89,11 +89,9 @@ for i = 1:n
     k = 1/(pi*Aw*S);
 
     %% Drag, second Swet is input for Sref in DPT
-    [CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
-
+    [CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(length(aoarange),PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
     %% Performance
-    [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
-
+    [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead);
     % %% CG
     % [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
     %
@@ -114,7 +112,13 @@ for i = 1:n
     % [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
 
     %% Saving the Data, considering
-    UAV = Save(Df,We,PE,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
+    %Change the static stab. var when ryan's functions function
+    XCG = 0;
+    ZCG = 0;
+    Wtotal = W;
+    hn = 0;
+    staticmargin = -1; %the passing cond
+    UAV = Save(Df,We(j),Pe(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
     Data(i) = UAV;
 end
 
@@ -124,8 +128,10 @@ for i = 1:n
 end
 %% Result Plotting
 %Preallocate arrays to hold histogram data here
-HDf = zeros(1,n);
+HDf = []; %empty arrays bc. i dont want it to saturate the 0 mark
 for i = 1:n
-    HDf(i) = Data(i).Df * Data(i).result; %by multiplying by the result, all false(0) entries will be marked as 0, this keeps the hist. array the same size as the Data struct. array
+    if Data(i).result == true 
+        HDf(i) = Data(i).Df; 
+    end
 end
 histogram(HDf);
