@@ -66,7 +66,7 @@ W_landgear = 10;
 % tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
 %Trial Variables to Save data
-n = 50; %number of trials to run
+n = 500; %number of trials to run
  %Can't seem to find a way to preallocate for structs
 
 %The Loop to calculate all our data
@@ -128,10 +128,22 @@ for i = 1:n
 end
 %% Result Plotting
 %Preallocate arrays to hold histogram data here
+%Successful Data arrays
 HDf = []; %empty arrays bc. i dont want it to saturate the 0 mark
+
+%All Data Arrays
+PDf = zeros(1,n);
 for i = 1:n
-    if Data(i).result == true 
+    if Data(i).result == true
         HDf(i) = Data(i).Df; 
     end
+    PDf(i) = Data(i).Df;
 end
+% Add more figures following the format to plot other data
+figure()
+hold
 histogram(HDf);
+histogram(PDf);
+legend('Successful','All');
+
+
