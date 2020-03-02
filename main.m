@@ -72,19 +72,22 @@ Data = zeros(1,n); %length n row vector to store aircraft struct data for each t
 %The Loop to calculate all our data
 for i = 1:n
     %% Calculation Control
-    j = 1; %var to control engine choice
-    W = Wb + We(j) + Wfilters; %Total Weight TODO:Fix niccolai implementation and incorporate that into this sum
+    %if you add to here, also add to save
+    j = ceil(rand()*length(We)); %Chooses a random engine
+    W = Wb + We(j) + Wfilters; %Total Weight
     PE = Pe(j); %engine power
+    Df = rand()*1 + 1; %Makes
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
-    %planform surface area of plane
-    S = Sw+St; %assuming only wings provide lift
-    %k calc for performance
-    k = 1/(pi*Aw*S);
 
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
     L = Lw + Lt;
+    %planform surface area of plane
+    S = Sw+St; %assuming only wings provide lift
+    %k calc for performance input
+    k = 1/(pi*Aw*S);
+
     %% Drag, second Swet is input for Sref in DPT
     [CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
 
@@ -111,34 +114,18 @@ for i = 1:n
     [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
 
     %% Saving the Data, considering
-    UAV = Save(Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
+    UAV = Save(Df,We,PE,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
     Data(i) = UAV;
 end
+
 %% Spec Verification
 for i = 1:n
     Data(i).result = test(Data(i));
 end
-
-%Old Spec Verification
-% if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
-% fprintf('Success! \n') %in case we do generate one then add portion to display variablesgggg
-% fprintf('j =')
-% disp(j)
-% fprintf('tapw')
-% disp(tapw)
-% fprintf('Df')
-% disp(Df)
-% fprintf('Capacity of battery Ah')
-% disp(C)
-% fprintf('Sto =')
-% disp(Sto)
-% fprintf('Sl =')
-% disp(Sl)
-% fprintf('static margin =')
-% disp(staticmargin)
-% pause;
-% close all;
-% else
-% fprintf('end of test \n') %for debug
-% close all;
-% end
+%% Result Plotting
+%Preallocate arrays to hold histogram data here
+HDf = zeros(1,n);
+for i = 1:n
+    HDf(i) = Data(i).Df * Data(i).result; %by multiplying by the result, all false(0) entries will be marked as 0
+end
+histogram(HDf);

@@ -10,5 +10,9 @@ function [Return] = test(UAV)
         Return = false;
         return;
     end
-
+    if UAV.S_Margin > 0
+        Return = false;
+        return;
+    end
+    Return = true;
 end
