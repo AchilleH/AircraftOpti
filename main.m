@@ -48,22 +48,22 @@ W_guess= 200;
 W_avionics = 10;
 W_landgear = 10;
 % Niccolai Weight Esimations
-[W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess,Wfilters,W_avionics,W_landgear,We,Aw,Sw,St,St,bt,bt,tapw,T/c,V_max);
-nosearr = [0 0 10];
-avioarr = [13 0 W_avionics];
-filtarr = [16 0 Wfilters];
-fusearr = [20 0 Wf];
-htailarr = [33 0 Wht];
-engarr = [32 0 We];
-vtailarr = [33 0 Wvt];
-wingarr = [12 0 Ww];
-geararr = [wingarr(1) 0 W_landgear];
-% Order:        land gear     nose         avionics       filters       fueselage      h. tail         engine          v. tail          wing
-Xarmarray =   [ geararr(1)    nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
-Zarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
-weightarray = [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
-downwash = 0; %downwash effect on tail
-tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
+%[W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess,Wfilters,W_avionics,W_landgear,We,Aw,Sw,St,St,bt,bt,tapw,T/c,V_max);
+% nosearr = [0 0 10];
+% avioarr = [13 0 W_avionics];
+% filtarr = [16 0 Wfilters];
+% fusearr = [20 0 Wf];
+% htailarr = [33 0 Wht];
+% engarr = [32 0 We];
+% vtailarr = [33 0 Wvt];
+% wingarr = [12 0 Ww];
+% geararr = [wingarr(1) 0 W_landgear];
+% % Order:        land gear     nose         avionics       filters       fueselage      h. tail         engine          v. tail          wing
+% Xarmarray =   [ geararr(1)    nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+% Zarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+% weightarray = [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+% downwash = 0; %downwash effect on tail
+% tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
 %Trial Variables to Save data
 n = 50; %number of trials to run
@@ -94,24 +94,24 @@ for i = 1:n
     %% Performance
     [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
 
-    %% CG
-    [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
-
-    %% Neutral Point
-    [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
-
-    %% Static Margin
-    staticmargin = XCG/c-hn;
-
-    %% Wing, Engine, Fuselage Inertias
-    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
-    [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
-    [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
-    Ixarray = [Ixw,Ixe, Ixf];
-    Iyarray = [Iyw, Iye, Iyf];
-    Izarray = [Izw, Ize, Izf];
-    Ixzarray = [Ixzw, Ixze, Ixzf];
-    [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
+    % %% CG
+    % [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
+    %
+    % %% Neutral Point
+    % [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
+    %
+    % %% Static Margin
+    % staticmargin = XCG/c-hn;
+    %
+    % %% Wing, Engine, Fuselage Inertias
+    % [Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
+    % [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
+    % [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
+    % Ixarray = [Ixw,Ixe, Ixf];
+    % Iyarray = [Iyw, Iye, Iyf];
+    % Izarray = [Izw, Ize, Izf];
+    % Ixzarray = [Ixzw, Ixze, Ixzf];
+    % [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
 
     %% Saving the Data, considering
     UAV = Save(Df,We,PE,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
