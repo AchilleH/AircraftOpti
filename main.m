@@ -23,6 +23,7 @@ bw = 10.5; bt = bw/2; %Wingspans
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
 T = 0.1*c; %Airfoil thickness
 aoarange = -8:1:8; %range of aoa to evaluate over
+Tc = 1/12; %max thickness ratio, given by Niccolai
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
@@ -38,22 +39,23 @@ We = 192.5:27.5:495; %engine weight, engine weight seems to inc by ~53 every 10 
 xdivc = .7;   %chord wise position of max thickness (m)
 Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
+depthf = 0.02; %thickness of fuselage
 t = Df; %approximate max horizontal thickness along the vertical (m)
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 %Stability Specific Variables
 sspan = 10;
-fuselageL = 33; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
+fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
 V_max = 79; % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!!!!!!!!!!!!!
 
 % WEIGHT DISTRIBUTION
 
 % Order: x position, z position, weight
 W_guess= 200;
-W_avionics = 10;
-W_landgear = 10;
+W_avionics = 7;
+W_landgear = 7;
 % Niccolai Weight Esimations
-%[W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess,Wfilters,W_avionics,W_landgear,We(j),Aw,Sw,St,St,bt,bt,tapw,T/c,V_max,wingchord, c, htailac, vtailac, htailc, vtailc);
+%[W*0.4536, Ww*0.4536, Wf*0.4536, Wht*0.4536, Wvt*0.4536, We*0.4536] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,Tc,V_max*3.281,wingchord*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
 % nosearr = [0 0 10];
 % avioarr = [13 0 W_avionics];
 % filtarr = [16 0 Wfilters];

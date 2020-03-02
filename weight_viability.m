@@ -1,4 +1,4 @@
-function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio,tc,V_max,wingchord, wingac, htailac, vtailac, htailchord, vtailchord)
+function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio,tc,V_max,wingchord, wingac, htailac, vtailac, htailchord, vtailchord,fuselagelength,fuselagewidth,fuselagemaxdepth)
 
 n = 10;
 Wto = zeros(1,n);
@@ -12,7 +12,6 @@ ch = htailchord;
 cv = vtailchord;
 hach = htailac;
 hacv = vtailac;
-
 
 %% Component Weight Estimates- Nicolai
 
@@ -28,9 +27,9 @@ Ww=96.948*((W*N/10^5)^0.65*(AR/cos(Delta))^0.57*(S/100)^0.61*((1+tr)/(2*tc))^0.3
 
 %% Fuselage Weight
 
-lf=34; %ft       %Fuselage Length
-WF=5; %ft        %Fuselage Width
-D=1/12; %ft          %Fuselage Max Depth
+lf=fuselagelength; %ft       %Fuselage Length
+WF=fuselagewidth; %ft        %Fuselage Width
+D=fuselagemaxdepth; %ft          %Fuselage Max Depth
 
 Wf=200*((W*N/10^5)^0.286*(lf/10)^0.857*((WF+D)/10)*(Ve/100)^0.338)^1.1;
 
@@ -73,7 +72,7 @@ We=2.575.*(Weng).^0.922.*Neng;    %this equation likely over-estimates propulsio
 
 %% Fuel Weight
 
-Wfu = 50;   %(lbs)
+% Wfu = 50;   %(lbs)
 
 %% Fuel System Weight
 
@@ -100,7 +99,7 @@ Wpl= W_payload;
 
 %% TOTAL WEIGHT
 
-Wto(i)=Wstruct+Wp+Wsc+Wpl+Wfu;
+Wto(i)=Wstruct+Wp+Wsc+Wpl+Wau;
 W = Wto(i);
 
 end
