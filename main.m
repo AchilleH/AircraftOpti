@@ -46,7 +46,7 @@ Vhead = 0; %headwind
 %Stability Specific Variables
 sspan = 10;
 fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
-V_max = 79; % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!!!!!!!!!!!!!
+V_max = 50; % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!!!!!!!!!!!!!
 
 % WEIGHT DISTRIBUTION
 
