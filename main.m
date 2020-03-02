@@ -8,6 +8,11 @@ V = 0:47;       %aircraft velocity (m/s)
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
 c = 1;       %chord of aircraft wing(m)
+cac = .25*c; %AC of wing chord
+htailc = c; %chord of horizontal tail(m)
+htailac = htailc*.25; %AC of horizontal tail
+vtailc = c; %chord of vertical tail
+vtailac = vtailc*.25; %AC of vertical tail
 Clwa = 0.1; %WING 2d lift coefficient and vs alpha
 Clta = Clwa; % TAIL 2d lift coef. and vs alpha
 Aw = 11; At = Aw; % WING & TAIL aspect ratio
@@ -48,7 +53,7 @@ W_guess= 200;
 W_avionics = 10;
 W_landgear = 10;
 % Niccolai Weight Esimations
-%[W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess,Wfilters,W_avionics,W_landgear,We,Aw,Sw,St,St,bt,bt,tapw,T/c,V_max);
+%[W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess,Wfilters,W_avionics,W_landgear,We(j),Aw,Sw,St,St,bt,bt,tapw,T/c,V_max,wingchord, c, htailac, vtailac, htailc, vtailc);
 % nosearr = [0 0 10];
 % avioarr = [13 0 W_avionics];
 % filtarr = [16 0 Wfilters];
@@ -79,7 +84,8 @@ for i = 1:n
     Df = rand()*1 + 1; %Makes
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
-
+    %% Niccolai Estimate
+    
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
     L = Lw + Lt;

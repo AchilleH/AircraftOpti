@@ -1,31 +1,17 @@
-function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio,tc,V_max)
+function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio,tc,V_max,wingchord, wingac, htailac, vtailac, htailchord, vtailchord)
 
 n = 10;
 Wto = zeros(1,n);
-% W = 50;
 
 for i = 1:n
 Wto(i) = W;
 
-
-
-% S = 7.12;     %
-%
-% S = 18; %W/(.5*.00238*60^2 * 1.2 );
-%
-% A = 8.68;
-% Sh = 3.63;
-% Sv = 1.51;
-% bh = 3.88;
-% bv = 1.62;
-%
-
-hac = 0.25;
-c = 0.91;
-ch = 0.94;
-cv = .93;
-hach = 0.25;
-hacv = 0.25;
+hac = wingac;
+c = wingchord;
+ch = htailchord;
+cv = vtailchord;
+hach = htailac;
+hacv = vtailac;
 
 
 %% Component Weight Estimates- Nicolai
@@ -118,8 +104,5 @@ Wto(i)=Wstruct+Wp+Wsc+Wpl+Wfu;
 W = Wto(i);
 
 end
-%figure; grid on;
-hold on
 
-plot(Wto,'.-m')
 end
