@@ -126,6 +126,6 @@ end
 %Preallocate arrays to hold histogram data here
 HDf = zeros(1,n);
 for i = 1:n
-    HDf(i) = Data(i).Df * Data(i).result; %by multiplying by the result, all false(0) entries will be marked as 0
+    HDf(i) = Data(i).Df * Data(i).result; %by multiplying by the result, all false(0) entries will be marked as 0, this keeps the hist. array the same size as the Data struct. array
 end
 histogram(HDf);
