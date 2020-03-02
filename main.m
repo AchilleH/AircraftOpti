@@ -27,7 +27,7 @@ Wcarbonfilter = 2.5;
 Whyperhepafilter = 2.1044;
 Wfilters = ModNum*(Wprefilter+Wcarbonfilter+Whyperhepafilter); %weight of all filters in kg
 h = 1.8;       %height of aircraft (m)
-C = 0; %Battery Capacity (assuming LiPo Batteries)
+C = 10; %Battery Capacity (assuming LiPo Batteries)
 Pe = 20*10^3:5*10^3:75*10^3; %engine power [W]
 We = 192.5:27.5:495; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 xdivc = .7;   %chord wise position of max thickness (m)
@@ -76,7 +76,7 @@ for i = 1:n
     j = ceil(rand()*length(We)); %Chooses a random engine
     W = Wb + We(j) + Wfilters; %Total Weight
     PE = Pe(j); %engine power
-    Df = rand()*1 + 1; %Makes
+    Df = rand()*5 + 1; %Df range control
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
 
