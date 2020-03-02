@@ -115,7 +115,9 @@ for i = 1:n
     Data(i) = UAV;
 end
 %% Spec Verification
-%TODO: Have a Verification Test for all concatenated data, then output histograms
+for i = 1:n
+    Data(i).result = test(Data(i));
+end
 
 %Old Spec Verification
 % if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
