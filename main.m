@@ -26,10 +26,10 @@ Wprefilter = 1.2224;
 Wcarbonfilter = 2.5;
 Whyperhepafilter = 2.1044;
 Wfilters = ModNum*(Wprefilter+Wcarbonfilter+Whyperhepafilter); %weight of all filters in kg
-%engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 h = 1.8;       %height of aircraft (m)
+C = 0; %Battery Capacity (assuming LiPo Batteries)
 Pe = 20*10^3:5*10^3:75*10^3; %engine power [W]
-We = 192.5:27.5:495; %engine weight
+We = 192.5:27.5:495; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 xdivc = .7;   %chord wise position of max thickness (m)
 Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
@@ -65,53 +65,61 @@ weightarray = [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(
 downwash = 0; %downwash effect on tail
 tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
+%Trial Variables to Save data
+n = 50; %number of trials to run
+Data = zeros(1,n); %length n row vector to store aircraft struct data for each trial
 
-%% Calculation Control
-j = 1; %var to control engine choice
-W = Wb + We(j) + Wfilters; %Total Weight TODO:Fix niccolai implementation and incorporate that into this sum
-PE = Pe(j); %engine power
-C = 0; %Battery Capacity
-%Recalculating Swet for changing fuselage diameter
-Swet = pi*(Df/2)^2 + T*bw + T*bt;
-%planform surface area of plane
-S = Sw+St; %assuming only wings provide lift
-%k calc for performance
-k = 1/(pi*Aw*S);
+%The Loop to calculate all our data
+for i = 1:n
+    %% Calculation Control
+    j = 1; %var to control engine choice
+    W = Wb + We(j) + Wfilters; %Total Weight TODO:Fix niccolai implementation and incorporate that into this sum
+    PE = Pe(j); %engine power
+    %Recalculating Swet for changing fuselage diameter
+    Swet = pi*(Df/2)^2 + T*bw + T*bt;
+    %planform surface area of plane
+    S = Sw+St; %assuming only wings provide lift
+    %k calc for performance
+    k = 1/(pi*Aw*S);
 
-%% Lift
-[Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
+    %% Lift
+    [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
+    L = Lw + Lt;
+    %% Drag, second Swet is input for Sref in DPT
+    [CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
 
-%% Drag, second Swet is input for Sref in DPT
-[CDi,Q,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
+    %% Performance
+    [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
 
-%% Performance
-[Sto,Sl,C,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead,Vstall);
+    %% CG
+    [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
 
-%% CG
-[XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
+    %% Neutral Point
+    [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
 
-%% Neutral Point
-[hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
+    %% Static Margin
+    staticmargin = XCG/c-hn;
 
-%% Static Margin
-staticmargin = XCG/c-hn;
+    %% Wing, Engine, Fuselage Inertias
+    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
+    [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
+    [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
+    Ixarray = [Ixw,Ixe, Ixf];
+    Iyarray = [Iyw, Iye, Iyf];
+    Izarray = [Izw, Ize, Izf];
+    Ixzarray = [Ixzw, Ixze, Ixzf];
+    [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
 
-%% Wing, Engine, Fuselage Inertias
-[Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
-[Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
-[Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
-Ixarray = [Ixw,Ixe, Ixf];
-Iyarray = [Iyw, Iye, Iyf];
-Izarray = [Izw, Ize, Izf];
-Ixzarray = [Ixzw, Ixze, Ixzf];
-[Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
-
+    %% Saving the Data, considering
+    UAV = Save(Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
+    Data(i) = UAV;
+end
 %% Spec Verification
 %TODO: Have a Verification Test for all concatenated data, then output histograms
 
 %Old Spec Verification
 % if(Emax >= 2  && Sto < 121 && Sl < 121 && Sw <= bw*c && St <= bt*c)
-% fprintf('Success! \n') %in case we do generate one then add portion to display variables
+% fprintf('Success! \n') %in case we do generate one then add portion to display variablesgggg
 % fprintf('j =')
 % disp(j)
 % fprintf('tapw')
