@@ -43,9 +43,21 @@ TRmin = zeros(1,n);
         Vtd = 0.7*Vstall(i);
         Va = 1.3*Vstall(i);
         V2 = 1.2*Vstall(i);
-        in1 = find(V==round(1.1*Vstall(i))); %gets the index of the closest V for avg takeoff V
-        in2 = find(V==round(1.25*Vstall(i))); %same but landing
-        in3 = find(V==round(0.7*Vtd)); %for touchdown acceleration assumption
+        if 1.1*Vstall(i) <= max(V)
+            in1 = find(V==round(1.1*Vstall(i))); %gets the index of the closest V for avg takeoff V
+        else
+            in1 = 1;
+        end
+        if 1.25*Vstall(i) <= max(V)
+            in2 = find(V==round(1.25*Vstall(i))); %same but landing
+        else
+            in2 = 1;
+        end
+        if 0.7*Vtd <= max(V)
+            in3 = find(V==round(0.7*Vtd)); %for touchdown acceleration assumption
+        else
+            in3 = 1;
+        end
         T1 = T(in1); D1 = D(i,in1);
         T2 = T(in2); D2 = D(i,in2);
         T3 = T(in3); D3 = D(i,in3); L3 = L(i,in3);
