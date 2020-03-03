@@ -39,7 +39,7 @@ if(bw ~= 0 && ARw ~= 0 && Df ~= 0)
     f = 0.0524*tap^4 - 0.15*tap^3 + 0.1659*tap^2 - 0.0706*tap + 0.0119;
     eth = 1/(1+f*ARw);
     kf = 1 - 2*(Df/bw)^2;
-    ew = eth * kf * 0.804;
+    ew = abs(eth * kf * 0.804);
 else
     ew = 0.7;
 end
@@ -50,7 +50,7 @@ if(bt ~= 0 && ARt ~= 0 && Df ~= 0)
     f = 0.0524*tap^4 - 0.15*tap^3 + 0.1659*tap^2 - 0.0706*tap + 0.0119;
     eth = 1/(1+f*ARt);
     kf = 1 - 2*(Df/bt)^2;
-    et = eth * kf * 0.804;
+    et = abs(eth * kf * 0.804);
 else
     et = 0.7;
 end

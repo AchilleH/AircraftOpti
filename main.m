@@ -33,7 +33,7 @@ Wcarbonfilter = 2.5;
 Whyperhepafilter = 2.1044;
 Wfilters = ModNum*(Wprefilter+Wcarbonfilter+Whyperhepafilter); %weight of all filters in kg
 h = 1.8;       %height of aircraft (m)
-C = 0; %Battery Capacity (assuming LiPo Batteries)
+C = 10; %Battery Capacity (assuming LiPo Batteries)
 Pe = 20*10^3:5*10^3:75*10^3; %engine power [W]
 We = 192.5:27.5:495; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 xdivc = .7;   %chord wise position of max thickness (m)
@@ -73,7 +73,7 @@ W_landgear = 7;
 % tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
 %Trial Variables to Save data
-n = 50; %number of trials to run
+n = 500; %number of trials to run
  %Can't seem to find a way to preallocate for structs
 
 %The Loop to calculate all our data
@@ -83,7 +83,7 @@ for i = 1:n
     j = ceil(rand()*length(We)); %Chooses a random engine
     W = Wb + We(j) + Wfilters; %Total Weight
     PE = Pe(j); %engine power
-    Df = rand()*1 + 1; %Makes
+    Df = rand()*5 + 1; %Df range control
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
@@ -160,10 +160,22 @@ for i = 1:n
 end
 %% Result Plotting
 %Preallocate arrays to hold histogram data here
+%Successful Data arrays
 HDf = []; %empty arrays bc. i dont want it to saturate the 0 mark
+
+%All Data Arrays
+PDf = zeros(1,n);
 for i = 1:n
-    if Data(i).result == true 
+    if Data(i).result == true
         HDf(i) = Data(i).Df; 
     end
+    PDf(i) = Data(i).Df;
 end
+% Add more figures following the format to plot other data
+figure()
+hold
 histogram(HDf);
+histogram(PDf);
+legend('Successful','All');
+
+
