@@ -92,7 +92,6 @@ for i = 1:n
     weightarray = [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
     downwash = 0; %downwash effect on tail
     tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
-    [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
     
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
@@ -106,24 +105,24 @@ for i = 1:n
     [CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(length(aoarange),PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
     %% Performance
     [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead);
-    % %% CG
-    % [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
-    %
-    % %% Neutral Point
-    % [hn] = neutral_point(0.25*c, tailac, St, Sw, CLta, CLa, downwasheffect);
-    %
-    % %% Static Margin
-    % staticmargin = XCG/c-hn;
-    %
-    % %% Wing, Engine, Fuselage Inertias
-    % [Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
-    % [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
-    % [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
-    % Ixarray = [Ixw,Ixe, Ixf];
-    % Iyarray = [Iyw, Iye, Iyf];
-    % Izarray = [Izw, Ize, Izf];
-    % Ixzarray = [Ixzw, Ixze, Ixzf];
-    % [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
+    %% CG
+    [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
+    
+    %% Neutral Point
+    [hn] = neutral_point(cac, htailac, St, Sw, CLta, CLwa, downwash);
+    
+    %% Static Margin
+    staticmargin = XCG/c-hn;
+    
+    %% Wing, Engine, Fuselage Inertias
+    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
+    [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
+    [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
+    Ixarray = [Ixw,Ixe, Ixf];
+    Iyarray = [Iyw, Iye, Iyf];
+    Izarray = [Izw, Ize, Izf];
+    Ixzarray = [Ixzw, Ixze, Ixzf];
+    [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function

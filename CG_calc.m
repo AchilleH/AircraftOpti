@@ -4,7 +4,7 @@ Wtotal = 0;
 MXtotal = 0;
 MZtotal = 0;
 
-for i=0:length(weightarray)
+for i=1:length(weightarray)
     Wtotal = Wtotal+weightarray(i); % sum all the weights
     MXtotal = MXtotal+weightarray(i)*Xarmarray(i); % sum all the x direction moment arms
     MZtotal = MZtotal+weightarray(i)*Zarmarray(i); % sum all the z direction moment arms
