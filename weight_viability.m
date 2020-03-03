@@ -1,4 +1,4 @@
-function [W, Ww, Wf, Wht, Wvt, Wp] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio,tc,V_max,wingchord, wingac, htailac, vtailac, htailchord, vtailchord,fuselagelength,fuselagewidth,fuselagemaxdepth)
+function [W, Ww, Wf, Wht, Wvt, We] = weight_viability(W,W_payload,W_avionics,W_landgear,We, AR, S, Sh, Sv, bh, bv, taper_ratio,tc,V_max,wingchord, wingac, htailac, vtailac, htailchord, vtailchord,fuselagelength,fuselagewidth,fuselagemaxdepth)
 
 n = 10;
 Wto = zeros(1,n);
@@ -99,7 +99,7 @@ Wpl= W_payload;
 
 %% TOTAL WEIGHT
 
-Wto(i)=Wstruct+Wp+Wsc+Wpl+Wau;
+Wto(i)=Wstruct+We+Wsc+Wpl+Wau;
 W = Wto(i);
 
 end
