@@ -65,7 +65,7 @@ Wstruct=Ww+Wf+Wht+Wvt+Wlg;
 Weng=We; %(lbs)     %Bare Engine Weight
 Neng=1;             %# Engines
 
-We=2.575.*(Weng).^0.922.*Neng;    %this equation likely over-estimates propulsion unit weight for a small UAV
+Wp=2.575.*(Weng).^0.922.*Neng;    %this equation likely over-estimates propulsion unit weight for a small UAV
 
 
 %% Fuel Weight
@@ -97,7 +97,7 @@ Wpl= W_payload;
 
 %% TOTAL WEIGHT
 
-Wto(i)=Wstruct+We+Wsc+Wpl+Wau;
+Wto(i)=Wstruct+Wp+Wsc+Wpl+Wau;
 W = Wto(i);
 
 end
