@@ -21,7 +21,7 @@ N=6.6;              %Ultimate Load Factor (1.5 times limit load factor)(GIVEN)
 Delta=0*pi/180;%Deg %Wing 1/4 chord sweep angle
 tr=taper_ratio;               %Taper Ratio
              %Maximum Thickness Ratio (input)
-Ve=V_max;%kts         %Equivalent Vmax at SL
+Ve=V_max; %kts         %Equivalent Vmax at SL
 
 Ww=96.948*((W*N/10^5)^0.65*(AR/cos(Delta))^0.57*(S/100)^0.61*((1+tr)/(2*tc))^0.36*(1+Ve/500)^0.5)^0.993;
 
@@ -34,8 +34,6 @@ D=fuselagemaxdepth; %ft          %Fuselage Max Depth
 Wf=200*((W*N/10^5)^0.286*(lf/10)^0.857*((WF+D)/10)*(Ve/100)^0.338)^1.1;
 
 %% Horizontal Tail Weight
-
-
 
 lh=35 / 12 + (.5 - hac) * c - (.5 - hach) * ch; %ft       %Distance from Wing MAC to Tail MAC
 thr=ch*.12*12; %ft      %horizontal tail max root thickness (chord * thick/chord)

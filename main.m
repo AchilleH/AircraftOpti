@@ -2,7 +2,7 @@ clc; clear; close all;
 
 %% CONSTANTS
 rho = 1.18; % Air density kg/m^3
-V = 0:47;       %aircraft velocity (m/s)
+V = 0:100;       %aircraft velocity (m/s)
 
 %% Variables
 %AIRFOIL DATA
@@ -46,7 +46,7 @@ Vhead = 0; %headwind
 %Stability Specific Variables
 sspan = 10;
 fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
-V_max = 50; % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!!!!!!!!!!!!!
+V_max = 50; % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
 
 % WEIGHT DISTRIBUTION
 
@@ -64,26 +64,25 @@ for i = 1:n
     %% Calculation Control
     %if you add to here, also add to save
     j = ceil(rand()*length(We)); %Chooses a random engine
-    W = Wb + We(j) + Wfilters; %Total Weight
     PE = Pe(j); %engine power
     Df = rand()*5 + 1; %Df range control
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
 
-    [W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,Tc,V_max*3.281,c*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
+    [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,Tc,V_max*3.281,c*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
     W = W*.4536; %translating from lb to kg
     Ww = Ww*.4536; %translating from lb to kg
     Wf = Wf*.4536; %translating from lb to kg
     Wht = Wht*.4536; %translating from lb to kg
     Wvt = Wvt*.4536; %translating from lb to kg
-    We = We*.4536; %translating from lb to kg
+    Weng = Weng*.4536; %translating from lb to kg
     nosearr = [0 0 10];
     avioarr = [13 0 W_avionics];
     filtarr = [16 0 Wfilters];
     fusearr = [20 0 Wf];
     htailarr = [33 0 Wht];
-    engarr = [32 0 We];
+    engarr = [32 0 Weng];
     vtailarr = [33 0 Wvt];
     wingarr = [12 0 Ww];
     geararr = [wingarr(1) 0 W_landgear];
