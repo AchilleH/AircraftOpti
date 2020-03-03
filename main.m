@@ -71,7 +71,7 @@ for i = 1:n
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
 
-    [W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,Tc,V_max*3.281,wingchord*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
+    [W, Ww, Wf, Wht, Wvt, We] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,Tc,V_max*3.281,c*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
     W = W*.4536; %translating from lb to kg
     Ww = Ww*.4536; %translating from lb to kg
     Wf = Wf*.4536; %translating from lb to kg
