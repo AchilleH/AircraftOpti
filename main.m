@@ -54,23 +54,6 @@ V_max = 50; % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!!!!!!!!!!!
 W_guess= Wb;
 W_avionics = 7;
 W_landgear = 7;
-% Niccolai Weight Esimations
-% [W*0.4536, Ww*0.4536, Wf*0.4536, Wht*0.4536, Wvt*0.4536, We*0.4536] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,Tc,V_max*3.281,wingchord*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
-% nosearr = [0 0 10];
-% avioarr = [13 0 W_avionics];
-% filtarr = [16 0 Wfilters];
-% fusearr = [20 0 Wf];
-% htailarr = [33 0 Wht];
-% engarr = [32 0 We];
-% vtailarr = [33 0 Wvt];
-% wingarr = [12 0 Ww];
-% geararr = [wingarr(1) 0 W_landgear];
-% % Order:        land gear     nose         avionics       filters       fueselage      h. tail         engine          v. tail          wing
-% Xarmarray =   [ geararr(1)    nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
-% Zarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
-% weightarray = [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
-% downwash = 0; %downwash effect on tail
-% tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
 %Trial Variables to Save data
 n = 500; %number of trials to run
