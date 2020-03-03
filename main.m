@@ -21,9 +21,8 @@ tapw = 0; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
-T = 0.1*c; %Airfoil thickness
+T = 0.1*c; %Airfoil max thickness
 aoarange = -8:1:8; %range of aoa to evaluate over
-Tc = 1/12; %max thickness ratio, given by Niccolai
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
@@ -56,8 +55,8 @@ W_avionics = 7;
 W_landgear = 7;
 
 %Trial Variables to Save data
+%Can't seem to find a way to preallocate for structs
 n = 500; %number of trials to run
- %Can't seem to find a way to preallocate for structs
 
 %The Loop to calculate all our data
 for i = 1:n
@@ -70,13 +69,14 @@ for i = 1:n
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
 
-    [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,Tc,V_max*3.281,c*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
-    W = W*.4536; %translating from lb to kg
-    Ww = Ww*.4536; %translating from lb to kg
-    Wf = Wf*.4536; %translating from lb to kg
-    Wht = Wht*.4536; %translating from lb to kg
-    Wvt = Wvt*.4536; %translating from lb to kg
-    Weng = Weng*.4536; %translating from lb to kg
+    [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,T/c,V_max*3.281,c*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
+    %conversion from lb to kg
+    W = W*.4536; %total weight
+    Ww = Ww*.4536; %wing weight
+    Wf = Wf*.4536; %fuselage weight
+    Wht = Wht*.4536; %horizontal tail weight
+    Wvt = Wvt*.4536; %vertical tail weight
+    Weng = Weng*.4536; %weight of propulsion system(eng and air intake etc)
     nosearr = [0 0 10]; %x position, z position, weight for nose cone
     avioarr = [13 0 W_avionics]; %x position, z position, weight for avionics
     filtarr = [16 0 Wfilters]; %x position, z position, weight for filters
@@ -115,7 +115,7 @@ for i = 1:n
     staticmargin = XCG/c-hn;
     
     %% Wing, Engine, Fuselage Inertias
-    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG);
+    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww,type, phiw,phiw,tapw,tapw,c,wingstart,span,Df/2,planetoCG);
     [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
     [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
     Ixarray = [Ixw,Ixe, Ixf];
