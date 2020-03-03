@@ -127,11 +127,6 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    XCG = 0;
-    ZCG = 0;
-    Wtotal = W;
-    hn = 0;
-    staticmargin = -1; %the passing cond
     UAV = Save(Df,We(j),Pe(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
     Data(i) = UAV;
 end
