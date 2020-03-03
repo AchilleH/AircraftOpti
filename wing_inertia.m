@@ -6,6 +6,8 @@ function [Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trai
 % t_t = thickness of tip chord
 % c = chord
 % b = span (one wing, not total)
+% type: user-defined, = 0 for calculating for wing, = 1 for calculating for
+% tail
 
 W_w = wingweight;
 Lam_l = leadingsweep;
@@ -14,11 +16,11 @@ t_r = roottaper;
 t_t = tiptaper;
 c = chord;
 b = span;
-wing = 0;
-tail = 1;
-YS1dot = span-planetoCG;
-YS4 = fuselageradius;
-XS4 = wingstart;
+wing = 0; % control for calculating wing_inertia for an actual wing
+tail = 1; % control for calculating wing_inertia for a tail wing
+YS1dot = span-planetoCG; % wing span (one wing) subtracted by the distance from the aircraft fuselage centerline to the wing CG (half span plus fuselage D for rectangular wings)
+YS4 = fuselageradius; % y position of wing start ie fuselage radius
+XS4 = wingstart; % x position of start of wing
 
 V = b*(t_r(c+b/2*(tan(Lam_t)-tan(Lam_l)))-(t_r-t_t)*(c/2+b/3*(tan(Lam_t)-tan(Lam_l))));
 
