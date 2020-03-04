@@ -44,9 +44,8 @@ Vhead = 0; %headwind
 Motors = ['180M-2','200L1-2','200L2-2','225M-2','250M-2','280S-2','280M-2','315S-2'];
 Pe = [22000,30000,37000,45000,55000,75000,90000,110000]; %engine power [W]
 We = [165,218,230,280,365,495,565,890]; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
-Rmot = .5* [.455,.505,.505,.560,.615,.680,.680,.845];
-Lmot = [.7,.77,.77,.815,.910,.985,1.035,1.185]; %(m) will be array matching We and Pe
-
+Rmot = .5* [.455,.505,.505,.560,.615,.680,.680,.845]; %Radius of motor
+Lmot = [.7,.77,.77,.815,.910,.985,1.035,1.185]; %(m) Length of motor
 %Stability Specific Variables
 %Weights
 Wnc = 0; %weight of nosecone [kg]
@@ -75,7 +74,9 @@ for i = 1:n
     %if you add to here, also add to save
     j = ceil(rand()*length(We)); %Chooses a random engine
     PE = Pe(j); %engine power
-    Df = rand()*5 + 1; %Df range control
+    Df = rand()*2 + 1; %Df range control
+    bw = rand()*5 + 10; %wingspan randomizer
+    bt = bw/2; %tail wingspan
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
@@ -161,8 +162,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    UAV = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
-    Data(i) = UAV;
+    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
 end
 
 %% Spec Verification
