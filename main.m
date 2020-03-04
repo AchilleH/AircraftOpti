@@ -60,8 +60,8 @@ Ltc = 0;%length of tailcone [m]
 fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
 V_max = max(V); % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
 Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diameter than motor
-Xmotor = ;
-
+XZmotor = 0; %distance between motor CG and XZplane
+XYmotor = 0; %distance between motor CG and XY plane
 
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
