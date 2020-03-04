@@ -8,30 +8,6 @@ function [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho
 
 %e = 0.7 for rect, 1 for ellipse or taper of ~0.3-0.4
 
-%% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
-if(Sw == 0 && ARw ~= 0 && bw ~= 0)
-   Sw = bw^2/ARw;
-end
-if(Sw ~= 0 && ARw == 0 && bw ~= 0)
-   ARw = bw^2/Sw;
-end
-if(Sw ~= 0 && ARw ~= 0 && bw == 0)
-   bw = sqrt(Sw*ARw);
-end
-
-if(St == 0 && ARt ~= 0 && bt ~= 0)
-   St = bt^2/ARt;
-end
-if(St ~= 0 && ARt == 0 && bt ~= 0)
-   ARt = bt^2/St;
-end
-if(St ~= 0 && ARt ~= 0 && bt == 0)
-   bt = sqrt(St*ARt);
-end
-if(Sref == 0)
-    Sref = Sw;
-end
-
 %% Assigning e
 if(bw ~= 0 && ARw ~= 0 && Df ~= 0)
     dtap = -0.357 + 0.45*exp(0.0375*phiw);

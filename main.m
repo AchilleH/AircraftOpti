@@ -82,6 +82,29 @@ for i = 1:n
     bt = bw/2; %tail wingspan
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
+    %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
+    if(Sw == 0 && ARw ~= 0 && bw ~= 0)
+       Sw = bw^2/ARw;
+    end
+    if(Sw ~= 0 && ARw == 0 && bw ~= 0)
+       ARw = bw^2/Sw;
+    end
+    if(Sw ~= 0 && ARw ~= 0 && bw == 0)
+       bw = sqrt(Sw*ARw);
+    end
+
+    if(St == 0 && ARt ~= 0 && bt ~= 0)
+       St = bt^2/ARt;
+    end
+    if(St ~= 0 && ARt == 0 && bt ~= 0)
+       ARt = bt^2/St;
+    end
+    if(St ~= 0 && ARt ~= 0 && bt == 0)
+       bt = sqrt(St*ARt);
+    end
+    if(Sref == 0)
+        Sref = Sw;
+    end
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
@@ -198,20 +221,32 @@ end
 %Preallocate arrays to hold histogram data here
 %Successful Data arrays
 HDf = []; %empty arrays bc. i dont want it to saturate the 0 mark
-
+HWe = [];
+HPe = [];
+Hbw = [];
 %All Data Arrays
 PDf = zeros(1,n);
+PWe = zeros(1,n);
+PPe = zeros(1,n);
+Pbw = zeros(1,n);
 for i = 1:n
     if Data(i).result == true
         HDf(i) = Data(i).Df; 
+        HWe(i) = Data(i).We;
+        HPe(i) = Data(i).Pe;
+        Hbw(i) = Data(i).bw;
     end
     PDf(i) = Data(i).Df;
+    PWe(i) = Data(i).We;
+    PPe(i) = Data(i).Pe;
+    Pbw(i) = Data(i).bw;
 end
 % Add more figures following the format to plot other data
-figure()
-hold
-histogram(HDf);
-histogram(PDf);
-legend('Successful','All');
+dataAnalysis(HDf,PDf,'Df');
+dataAnalysis(HWe,PWe,'We');
+dataAnalysis(HPe,PPe,'Pe');
+dataAnalysis(Hbw,Pbw,'bw');
+
+
 
 
