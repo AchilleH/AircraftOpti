@@ -13,13 +13,13 @@ ct = c; %chord of horizontal tail(m)
 act = ct*.25; %AC of horizontal tail
 vtailc = c; %chord of vertical tail
 vtailac = vtailc*.25; %AC of vertical tail
-htailc = c; % chord of horizontal tail
-htailac = .25*c; % AC of vertical tail
+htailc = c;
+vtailac = .25*c;
 Clwa = 0.1; %WING 2d lift coefficient and vs alpha
 Clta = Clwa; % TAIL 2d lift coef. and vs alpha
 Aw = 11; At = Aw; % WING & TAIL aspect ratio
 Sw = 0; St = 0;     % WING & TAIL planform area (m^2)
-tapw =  1; tapt = tapw; %Taper for wing and tail
+tapw = 1; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
@@ -154,7 +154,7 @@ for i = 1:n
     geararr =     [0,      wingarr(2),      Df/2,            W_landgear];
     
     %battery: length, x position (CG), z position (CG), weight
-    battarr =      [0.5,      nosecone(1),   Df/2,            100];
+    battarr =      [0.5,      nosearr(1),   Df/2,            100];
     %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
     Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
     Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(2)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
@@ -211,16 +211,24 @@ for i = 1:n
     [Ixt2, Iyt2, Izt2, Ixzt2] = wing_inertia(Wht/2,true,phit,phit,tailroot_T,tailtip_T,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
     % v. tail
     [Ixvt, Iyvt, Izvt, Ixzvt] = wing_inertia(Wht/2,true,phit,phit,tailroot_T,tailtip_T,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
-
-    
-    
+    % engine
     [Ixe, Iye, Ize, Ixze] = engine_inertia(Weng,Rnac(j),XZmotor,XYmotor,YZmotor,Lmot(j));
+    % fuselage (includes nose and tail cones)
     [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(Df/2,Wnc,Wtc,Wf,XYfuselage,Lnc,Ltc,fuselageL);
-    Ixarray = [Ixw,Ixe, Ixf];
-    Iyarray = [Iyw, Iye, Iyf];
-    Izarray = [Izw, Ize, Izf];
-    Ixzarray = [Ixzw, Ixze, Ixzf];
-    [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixarray,Iyarray,Izarray,Ixzarray,weightarray,Xarmarray,Zarmarray);
+    % filters
+    [Ixfilt, Iyfilt, Izfilt, Ixzfilt] = box_inertia(filtarr(4),filtarr(1),Df/2,filtarr(3),filtarr(2));
+    % avionics
+    [Ixavi, Iyavi, Izavi, Ixzavi] = point_inertia(avioarr(4),avioarr(2),0,avioarr(3));
+    % landing gear
+    [Ixlgear, Iylgear, Izlgear, Ixzlgear] = point_inertia(avioarr(4),avioarr(2),0,avioarr(3));
+    % batteries
+    [Ixbatt, Iybatt, Izbatt, Ixzbatt] = box_inertia(battarr(4),battarr(1),Df,battarr(3),battarr(2));
+    
+    Ixtot = Ixw+Ixw2+Ixt+Ixt2+Ixvt+Ixe+Ixf+Ixfilt+Ixavi+Ixlgear+Ixbatt;
+    Iytot = Iyw+Iyw2+Iyt+Iyt2+Iyvt+Iye+Iyf+Iyfilt+Iyavi+Iylgear+Iybatt;
+    Iztot = Izw+Izw2+Izt+Izt2+Izvt+Ize+Izf+Izfilt+Izavi+Izlgear+Izbatt;
+    Ixztot = Ixzw+Ixzw2+Ixzt+Ixzt2+Ixzvt+Ixze+Ixzf+Ixzfilt+Ixzavi+Ixzlgear+Ixzbatt;
+    [Ixcg,Iycg,Izcg,Ixzcg] = inertial_calc(Ixtot,Iytot,Iztot,Ixztot,weightarray,Xarmarray,Zarmarray);
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
@@ -243,12 +251,15 @@ PDf = zeros(1,n);
 PWe = zeros(1,n);
 PPe = zeros(1,n);
 Pbw = zeros(1,n);
+
+i2 = 1; %for successful trials
 for i = 1:n
     if Data(i).result == true
-        HDf(i) = Data(i).Df; 
-        HWe(i) = Data(i).We;
-        HPe(i) = Data(i).Pe;
-        Hbw(i) = Data(i).bw;
+        HDf(j) = Data(i).Df; 
+        HWe(j) = Data(i).We;
+        HPe(j) = Data(i).Pe;
+        Hbw(j) = Data(i).bw;
+        j = j+1;
     end
     PDf(i) = Data(i).Df;
     PWe(i) = Data(i).We;
