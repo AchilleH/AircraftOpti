@@ -75,7 +75,7 @@ for i = 1:n
     %if you add to here, also add to save
     j = ceil(rand()*length(We)); %Chooses a random engine
     PE = Pe(j); %engine power
-    YZmotor = fuselageL-Lmt(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
+    YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
     Df = rand()*5 + 1; %Df range control
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
