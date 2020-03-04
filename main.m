@@ -19,7 +19,7 @@ Clwa = 0.1; %WING 2d lift coefficient and vs alpha
 Clta = Clwa; % TAIL 2d lift coef. and vs alpha
 Aw = 11; At = Aw; % WING & TAIL aspect ratio
 Sw = 0; St = 0;     % WING & TAIL planform area (m^2)
-tapw = 0; tapt = tapw; %Taper for wing and tail
+tapw = 1; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
@@ -219,12 +219,15 @@ PDf = zeros(1,n);
 PWe = zeros(1,n);
 PPe = zeros(1,n);
 Pbw = zeros(1,n);
+
+i2 = 1; %for successful trials
 for i = 1:n
     if Data(i).result == true
-        HDf(i) = Data(i).Df; 
-        HWe(i) = Data(i).We;
-        HPe(i) = Data(i).Pe;
-        Hbw(i) = Data(i).bw;
+        HDf(j) = Data(i).Df; 
+        HWe(j) = Data(i).We;
+        HPe(j) = Data(i).Pe;
+        Hbw(j) = Data(i).bw;
+        j = j+1;
     end
     PDf(i) = Data(i).Df;
     PWe(i) = Data(i).We;
