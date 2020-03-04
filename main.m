@@ -66,7 +66,7 @@ W_avionics = 7 + Wbat;
 %Lengths
 Lnc = 0;%length of nosecone [m]
 Ltc = 0;%length of tailcone [m]
-fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
+fuselageL = 15; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
 V_max = max(V); % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
 Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diameter than motor
 XZmotor = 0; %distance between motor CG and XZplane
@@ -86,7 +86,7 @@ for i = 1:n
     PE = Pe(j); %engine power
     Df = rand()*2 + 1; %Df range control
     bw = rand()*5 + 10; %wingspan randomizer
-    bt = bw/2; %tail wingspan
+    bt = rand()*(bw-7) + 5; %tail wingspan
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
