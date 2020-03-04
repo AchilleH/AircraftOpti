@@ -2,8 +2,8 @@ function [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoe
 
 W_e = engineweight;
 R_e = nacelleradius;
-YP = XZtoengineCG;
-ZP = XYtoengineCG;
+YP = XZtoengineCG; % distance from xz plane ( upright along centerline of fuselage) to engine CG
+ZP = XYtoengineCG; % distance from xy plane (flat along bottom of aircraft) to engine CG
 l_e = enginelength;
 
 Ixe = W_e*R_e^2/2+W_e*(YP^2+ZP^2);
