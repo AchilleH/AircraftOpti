@@ -29,15 +29,19 @@ I_1xz = 0; % != 0 for anhedral or dihedral angles; This isn't even used ?
 %also seems as though 1 possibility was not considered, and the else only
 %sets up a value for k leaving the C_values to be random garbage in memory.
 %-achille
-if c < b*tan(Lam_l) && c < b*tan(Lam_l)+c
+
+temp1 = b*tan(Lam_l);
+temp2 = b*tan(Lam_l)+c;
+
+if c <= temp1 && c <= temp2
     C_a = c;
     C_b = b*tan(Lam_l);
     C_c = b*tan(Lam_l)+c;
-elseif c > b*tan(Lam_l) && c < b*tan(Lam_l)+c
+elseif c >= temp1 && c < temp2
     C_a = b*tan(Lam_l);
     C_b = c;
     C_c = b*tan(Lam_l)+c;
-elseif c > b*tan(Lam_l) && c > b*tan(Lam_l)+c
+elseif c >= temp1 && c >= temp2
     C_a = b*tan(Lam_l);
     C_b = b*tan(Lam_l)+c;
     C_c = c;
@@ -45,6 +49,7 @@ else
     K_0 = -1;
 end
 
+% different constants if it's a wing or tail
 if type == wing
     K_0 = 0.703;
 elseif type == tail

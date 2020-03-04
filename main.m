@@ -75,11 +75,11 @@ for i = 1:n
     %if you add to here, also add to save
     j = ceil(rand()*length(We)); %Chooses a random engine
     PE = Pe(j); %engine power
+    YZmotor = fuselageL-Lmt(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
     Df = rand()*5 + 1; %Df range control
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
-
     [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,T/c,V_max*3.281,c*3.281, acw*3.281, act*3.281, vtailac*3.281, ct*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
     %conversion from lb to kg
     W = W*.4536; %total weight
@@ -151,7 +151,7 @@ for i = 1:n
     Izw = Izw + Izw2 + Izt + Izt2;
     Ixzw = Ixzw + Ixzw2 + Ixzt + Ixzt2;
     
-    [Ixe, Iye, Ize, Ixze] = engine_inertia(Weng,Rnac(j),XZmotor,XYmotor,Lmot(j));
+    [Ixe, Iye, Ize, Ixze] = engine_inertia(Weng,Rnac(j),XZmotor,XYmotor,YZmotor,Lmot(j));
     [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(Df/2,Wnc,Wtc,Wf,XYfuselage,Lnc,Ltc,fuselageL);
     Ixarray = [Ixw,Ixe, Ixf];
     Iyarray = [Iyw, Iye, Iyf];
