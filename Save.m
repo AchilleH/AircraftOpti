@@ -1,8 +1,12 @@
-function [Data] = Save(Df,We,Pe,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin)
+function [Data] = Save(Df,M,Rm,Lm,We,Pe,Rnac,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin)
 %% Physical Characteristics
 Data.Df = Df;
+Data.Motor = M;
+Data.MotorRadius = Rm;
+Data.MotorLength = Lm;
 Data.We = We;
 Data.Pe = Pe;
+Data.NacelleRadius = Rnac;
 %% Lift Variables and Output
 Data.Sw = Sw;
 Data.St = St;

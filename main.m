@@ -8,9 +8,9 @@ V = 0:100;       %aircraft velocity (m/s)
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
 c = 1;       %chord of aircraft wing(m)
-cac = .25*c; %AC of wing chord
-htailc = c; %chord of horizontal tail(m)
-htailac = htailc*.25; %AC of horizontal tail
+acw = .25*c; %AC of wing chord
+ct = c; %chord of horizontal tail(m)
+act = ct*.25; %AC of horizontal tail
 vtailc = c; %chord of vertical tail
 vtailac = vtailc*.25; %AC of vertical tail
 Clwa = 0.1; %WING 2d lift coefficient and vs alpha
@@ -33,8 +33,6 @@ Whyperhepafilter = 2.1044;
 Wfilters = ModNum*(Wprefilter+Wcarbonfilter+Whyperhepafilter); %weight of all filters in kg
 h = 1.8;       %height of aircraft (m)
 C = 10; %Battery Capacity (assuming LiPo Batteries)
-Pe = 20*10^3:5*10^3:75*10^3; %engine power [W]
-We = 192.5:27.5:495; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 xdivc = .7;   %chord wise position of max thickness (m)
 Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
@@ -42,23 +40,34 @@ depthf = 0.02; %thickness of fuselage
 t = Df; %approximate max horizontal thickness along the vertical (m)
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
+%Motor info
+Motors = ['180M-2','200L1-2','200L2-2','225M-2','250M-2','280S-2','280M-2','315S-2'];
+Pe = [22000,30000,37000,45000,55000,75000,90000,110000]; %engine power [W]
+We = [165,218,230,280,365,495,565,890]; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
+Rmot = .5* [.455,.505,.505,.560,.615,.680,.680,.845];
+Lmot = [.7,.77,.77,.815,.910,.985,1.035,1.185]; %(m) will be array matching We and Pe
+
 %Stability Specific Variables
-sspan = 10;
-fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC
-V_max = 50; % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
-
-% WEIGHT DISTRIBUTION
-
-% Order: x position, z position, weight
+%Weights
+Wnc = 0; %weight of nosecone [kg]
+Wtc = 0; %weight of tailcone [kg]
 W_guess= Wb;
 W_avionics = 7;
 W_landgear = 7;
+%Lengths
+Lnc = 0;%length of nosecone [m]
+Ltc = 0;%length of tailcone [m]
+fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
+V_max = max(V); % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
+Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diameter than motor
+Xmotor = ;
+
 
 %Trial Variables to Save data
-%Can't seem to find a way to preallocate for structs
+%Can't seem to find an easy/worthwhile way to preallocate for structs
 n = 500; %number of trials to run
 
-%The Loop to calculate all our data
+%The Loop to Run Trials
 for i = 1:n
     %% Calculation Control
     %if you add to here, also add to save
@@ -69,7 +78,7 @@ for i = 1:n
     Swet = pi*(Df/2)^2 + T*bw + T*bt;
     %% Niccolai Estimate
 
-    [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,T/c,V_max*3.281,c*3.281, cac*3.281, htailac*3.281, vtailac*3.281, htailc*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
+    [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,T/c,V_max*3.281,c*3.281, acw*3.281, act*3.281, vtailac*3.281, ct*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
     %conversion from lb to kg
     W = W*.4536; %total weight
     Ww = Ww*.4536; %wing weight
@@ -77,7 +86,7 @@ for i = 1:n
     Wht = Wht*.4536; %horizontal tail weight
     Wvt = Wvt*.4536; %vertical tail weight
     Weng = Weng*.4536; %weight of propulsion system(eng and air intake etc)
-    nosearr = [0 0 10]; %x position, z position, weight for nose cone
+    nosearr = [0 0 Wnc]; %x position, z position, weight for nose cone
     avioarr = [13 0 W_avionics]; %x position, z position, weight for avionics
     filtarr = [16 0 Wfilters]; %x position, z position, weight for filters
     fusearr = [20 0 Wf]; %x position, z position, weight for fuselage
@@ -109,15 +118,38 @@ for i = 1:n
     [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
     
     %% Neutral Point
-    [hn] = neutral_point(cac, htailac, St, Sw, CLta, CLwa, downwash);
+    [hn] = neutral_point(acw, act, St, Sw, CLta, CLwa, downwash);
     
     %% Static Margin
     staticmargin = XCG/c-hn;
     
     %% Wing, Engine, Fuselage Inertias
-    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww,type, phiw,phiw,tapw,tapw,c,wingstart,span,Df/2,planetoCG);
-    [Ixe, Iye, Ize, Ixze] = engine_inertia(engineweight,nacelleradius,XZtoengineCG,XYtoengineCG,enginelength);
-    [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(fuselageradius,noseconeweight,tailconeweight,mainfuselageweight,xyplanetocenterline,noseconelength,tailconelength,mainfuselagelength);
+    %Wing inertia (type is bool, 0 = wing, 1 = tail)
+    %Wing inertia seems to need at least 2 calls, maybe 4?
+    %somehow they need to find their way into the final array
+    %how that will affect the final calc who tf knows
+    
+    %Assumptions
+    %assuming we need 4 calls (that the function only evaluates over 1 wing), so for wing weight val, dividing by 2
+    %assuming planetoCG only cares about y dist, since were aiming for 0
+    %sweep, going to assume that half the single wing span plus fuselage
+    %radius is sufficient for that variable - (bw/4 + Df/4) is equivalent
+    %2nd call has plane2cg as negative bc I assume we need that to balance
+    %symmetric forces
+    %They don't seem to account for z differences but output z values?
+    %in light of previous comment I will not account for vert. tail since
+    %it should be inline with fuselage centerline
+    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,wingstart,(bw-Df)/2,Df/2,bw/4 + Df/4);
+    [Ixw2, Iyw2, Izw2, Ixzw2] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,wingstart,(bw-Df)/2,Df/2,-bw/4 - Df/4);
+    [Ixt, Iyt, Izt, Ixzt] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,wingstart,(bt-Df)/2,Df/2,-bt/4 - Df/4);
+    [Ixt2, Iyt2, Izt2, Ixzt2] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,wingstart,(bt-Df)/2,Df/2,-bt/4 - Df/4);
+    Ixw = Ixw + Ixw2 + Ixt + Ixt2; %summation of 4 wing intertial contributions
+    Iyw = Iyw + Iyw2 + Iyt + Iyt2;
+    Izw = Izw + Izw2 + Izt + Izt2;
+    Ixzw = Ixzw + Ixzw2 + Ixzt + Ixzt2;
+    
+    [Ixe, Iye, Ize, Ixze] = engine_inertia(Weng,Rnac(j),XZtoengineCG,XYtoengineCG,Lmot(j));
+    [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(Df/2,Wnc,Wtc,Wf,xyplanetocenterline,Lnc,Ltc,mainfuselagelength);
     Ixarray = [Ixw,Ixe, Ixf];
     Iyarray = [Iyw, Iye, Iyf];
     Izarray = [Izw, Ize, Izf];
@@ -126,7 +158,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    UAV = Save(Df,We(j),Pe(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
+    UAV = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
     Data(i) = UAV;
 end
 
