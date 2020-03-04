@@ -63,7 +63,8 @@ Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diame
 XZmotor = 0; %distance between motor CG and XZplane
 XYmotor = 0; %distance between motor CG and XY plane
 XYfuselage = 0; %distance between XY plane and fuselage centerline
-
+Xwing = 0.4*fuselageL; %Distance between fuselage tip and tip of wing [m]
+Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
 n = 500; %number of trials to run
@@ -140,10 +141,10 @@ for i = 1:n
     %They don't seem to account for z differences but output z values?
     %in light of previous comment I will not account for vert. tail since
     %it should be inline with fuselage centerline
-    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,wingstart,(bw-Df)/2,Df/2,bw/4 + Df/4);
-    [Ixw2, Iyw2, Izw2, Ixzw2] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,wingstart,(bw-Df)/2,Df/2,-bw/4 - Df/4);
-    [Ixt, Iyt, Izt, Ixzt] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,wingstart,(bt-Df)/2,Df/2,-bt/4 - Df/4);
-    [Ixt2, Iyt2, Izt2, Ixzt2] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,wingstart,(bt-Df)/2,Df/2,-bt/4 - Df/4);
+    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,Xwing,(bw-Df)/2,Df/2,bw/4 + Df/4);
+    [Ixw2, Iyw2, Izw2, Ixzw2] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,Xwing,(bw-Df)/2,Df/2,-bw/4 - Df/4);
+    [Ixt, Iyt, Izt, Ixzt] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
+    [Ixt2, Iyt2, Izt2, Ixzt2] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
     Ixw = Ixw + Ixw2 + Ixt + Ixt2; %summation of 4 wing intertial contributions
     Iyw = Iyw + Iyw2 + Iyt + Iyt2;
     Izw = Izw + Izw2 + Izt + Izt2;
