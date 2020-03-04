@@ -60,8 +60,9 @@ Lmot = [.7,.77,.77,.815,.910,.985,1.035,1.185]; %(m) Length of motor
 Wnc = 0; %weight of nosecone [kg]
 Wtc = 0; %weight of tailcone [kg]
 W_guess= Wb;
-W_avionics = 7;
 W_landgear = 7;
+Wbat = 100; %weight of the batteries [kg]
+W_avionics = 7 + Wbat;
 %Lengths
 Lnc = 0;%length of nosecone [m]
 Ltc = 0;%length of tailcone [m]
@@ -72,7 +73,7 @@ XZmotor = 0; %distance between motor CG and XZplane
 XYmotor = 0; %distance between motor CG and XY plane
 XYfuselage = 0; %distance between XY plane and fuselage centerline
 Xwing = 0.4*fuselageL; %Distance between fuselage tip and tip of wing [m]
-Xtail = 2*fuselageL; %distance between fuselage tip and tip of tail [m]
+Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
 n = 500; %number of trials to run
@@ -124,7 +125,7 @@ for i = 1:n
     Weng = Weng*.4536; %weight of propulsion system (eng and air intake etc)
     
     %nose cone: length,  x position (CG),  z position (CG),  weight
-    nosearr =  [0.5,     .5/2,             Df/2,             Wnc];
+    nosearr =  [0.5,     .75*0.5,             Df/2,             Wnc];
     %tail cone: length,  x position (CG),               z position (CG),  weight
     tailarr =  [0.5,     nosearr(1)+fuselageL+.25,      Df/2,             Wnc]; 
     %avioncis: length, x position (CG), z position (CG), weight
@@ -144,7 +145,7 @@ for i = 1:n
     %landing gear: length, x position (CG), z position (CG), weight
     geararr =     [0,      wingarr(2),      Df/2,            W_landgear];
     %battery: length, x position (CG), z position (CG), weight
-    battarr =      [0.5,      nosearr(1),   Df/2,            100];
+    battarr =      [0.5,      nosearr(1),   Df/2,            Wbat];
     %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
     Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
     Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(2)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
