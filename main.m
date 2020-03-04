@@ -41,11 +41,12 @@ t = Df; %approximate max horizontal thickness along the vertical (m)
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 %Motor info
-Motors = ['180M-2','200L1-2','200L2-2','225M-2','250M-2','280S-2','280M-2','315S-2'];
+Motors = ["180M-2","200L1-2","200L2-2","225M-2","250M-2","280S-2","280M-2","315S-2"];
 Pe = [22000,30000,37000,45000,55000,75000,90000,110000]; %engine power [W]
 We = [165,218,230,280,365,495,565,890]; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
 Rmot = .5* [.455,.505,.505,.560,.615,.680,.680,.845]; %Radius of motor
 Lmot = [.7,.77,.77,.815,.910,.985,1.035,1.185]; %(m) Length of motor
+
 %Stability Specific Variables
 %Weights
 Wnc = 0; %weight of nosecone [kg]
@@ -63,7 +64,7 @@ XZmotor = 0; %distance between motor CG and XZplane
 XYmotor = 0; %distance between motor CG and XY plane
 XYfuselage = 0; %distance between XY plane and fuselage centerline
 Xwing = 0.4*fuselageL; %Distance between fuselage tip and tip of wing [m]
-Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
+Xtail = 2*fuselageL; %distance between fuselage tip and tip of tail [m]
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
 n = 500; %number of trials to run
@@ -123,7 +124,7 @@ for i = 1:n
     [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
     
     %% Neutral Point
-    [hn] = neutral_point(acw, act, St, Sw, CLta, CLwa, downwash);
+    [hn] = neutral_point(acw + Xwing/c, act + Xtail/c, St, Sw, CLta, CLwa, downwash);
     
     %% Static Margin
     staticmargin = XCG/c-hn;
