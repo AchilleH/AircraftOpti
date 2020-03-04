@@ -124,35 +124,25 @@ for i = 1:n
     Weng = Weng*.4536; %weight of propulsion system (eng and air intake etc)
     
     %nose cone: length,  x position (CG),  z position (CG),  weight
-    nosearr =  [0.5,     0.75,             Df/2,             Wnc]; 
-    
+    nosearr =  [0.5,     .5/2,             Df/2,             Wnc];
     %tail cone: length,  x position (CG),               z position (CG),  weight
     tailarr =  [0.5,     nosearr(1)+fuselageL+.25,      Df/2,             Wnc]; 
-    
     %avioncis: length, x position (CG), z position (CG), weight
     avioarr = [0,      nosearr(2),      Df/2,            W_avionics]; 
-    
     %filters:  length,                          x position (CG),  z position (CG), weight
     filtarr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wfilters];
-    
     %fuselage: length,                          x position (CG),  z position (CG), weight
     fusearr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wf]; 
-    
     %h. tail:   length, x position (CG), z position (CG), weight
     htailarr = [htailc, tailarr(2),      Df/2,            Wht]; 
-    
     %engine:  length,  x position (CG),  z position (CG), weight
     engarr = [Lmot(j), htailarr(2),      Df/2,            Weng]; 
-    
     %v. tail:   length, x position (CG),  z position (CG), weight
     vtailarr = [vtailc, htailarr(2),      Df/2,            Wvt]; 
-    
     %wing:     length, x position (CG),                    z position (CG), weight
     wingarr = [c,      .4*fuselageL+(.4*fuselageL)/2,      Df/2,            Ww];
-    
     %landing gear: length, x position (CG), z position (CG), weight
     geararr =     [0,      wingarr(2),      Df/2,            W_landgear];
-    
     %battery: length, x position (CG), z position (CG), weight
     battarr =      [0.5,      nosearr(1),   Df/2,            100];
     %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
