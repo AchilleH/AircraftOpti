@@ -267,10 +267,10 @@ for i = 1:n
     Pbw(i) = Data(i).bw;
 end
 % Add more figures following the format to plot other data
-% dataAnalysis(HDf,PDf,'Df');
-% dataAnalysis(HWe,PWe,'We');
-% dataAnalysis(HPe,PPe,'Pe');
-% dataAnalysis(Hbw,Pbw,'bw');
+dataAnalysis(HDf,PDf,'Df');
+dataAnalysis(HWe,PWe,'We');
+dataAnalysis(HPe,PPe,'Pe');
+dataAnalysis(Hbw,Pbw,'bw');
 
 
 
