@@ -62,6 +62,7 @@ V_max = max(V); % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
 Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diameter than motor
 XZmotor = 0; %distance between motor CG and XZplane
 XYmotor = 0; %distance between motor CG and XY plane
+XYfuselage = 0; %distance between XY plane and fuselage centerline
 
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
@@ -148,8 +149,8 @@ for i = 1:n
     Izw = Izw + Izw2 + Izt + Izt2;
     Ixzw = Ixzw + Ixzw2 + Ixzt + Ixzt2;
     
-    [Ixe, Iye, Ize, Ixze] = engine_inertia(Weng,Rnac(j),XZtoengineCG,XYtoengineCG,Lmot(j));
-    [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(Df/2,Wnc,Wtc,Wf,xyplanetocenterline,Lnc,Ltc,mainfuselagelength);
+    [Ixe, Iye, Ize, Ixze] = engine_inertia(Weng,Rnac(j),XZmotor,XYmotor,Lmot(j));
+    [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(Df/2,Wnc,Wtc,Wf,XYfuselage,Lnc,Ltc,fuselageL);
     Ixarray = [Ixw,Ixe, Ixf];
     Iyarray = [Iyw, Iye, Iyf];
     Izarray = [Izw, Ize, Izf];
