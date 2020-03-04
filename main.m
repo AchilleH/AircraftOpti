@@ -83,24 +83,24 @@ for i = 1:n
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
-    if(Sw == 0 && ARw ~= 0 && bw ~= 0)
-       Sw = bw^2/ARw;
+    if(Sw == 0 && Aw ~= 0 && bw ~= 0)
+       Sw = bw^2/Aw;
     end
-    if(Sw ~= 0 && ARw == 0 && bw ~= 0)
-       ARw = bw^2/Sw;
+    if(Sw ~= 0 && Aw == 0 && bw ~= 0)
+       Aw = bw^2/Sw;
     end
-    if(Sw ~= 0 && ARw ~= 0 && bw == 0)
-       bw = sqrt(Sw*ARw);
+    if(Sw ~= 0 && Aw ~= 0 && bw == 0)
+       bw = sqrt(Sw*Aw);
     end
 
-    if(St == 0 && ARt ~= 0 && bt ~= 0)
-       St = bt^2/ARt;
+    if(St == 0 && At ~= 0 && bt ~= 0)
+       St = bt^2/At;
     end
-    if(St ~= 0 && ARt == 0 && bt ~= 0)
-       ARt = bt^2/St;
+    if(St ~= 0 && At == 0 && bt ~= 0)
+       At = bt^2/St;
     end
-    if(St ~= 0 && ARt ~= 0 && bt == 0)
-       bt = sqrt(St*ARt);
+    if(St ~= 0 && At ~= 0 && bt == 0)
+       bt = sqrt(St*At);
     end
     if(Sref == 0)
         Sref = Sw;
