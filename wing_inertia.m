@@ -1,8 +1,6 @@
 function [Ixw, Iyw, Izw, Ixzw] = wing_inertia(wingweight,type, leadingsweep,trailingsweep,roottaper,tiptaper,chord,wingstart,span,fuselageradius,planetoCG)
 
-%why not just rename the variables in the argument section of the function?
-%you can always use comments to descibe what they are instead of writing
-%your thesis in the arguments -achille
+
 W_w = wingweight;
 Lam_l = leadingsweep;
 Lam_t = trailingsweep;
@@ -24,11 +22,7 @@ I_1z = I_1x+I_1y;
 I_1xz = 0; % != 0 for anhedral or dihedral angles; This isn't even used ?
 
 
-%This appears to be some control structure that uses the fuselage parallel
-%sweep distance compared to chord to set some future varibles up
-%also seems as though 1 possibility was not considered, and the else only
-%sets up a value for k leaving the C_values to be not defined .
-%-achille
+
 
 temp1 = b*tan(Lam_l);
 temp2 = b*tan(Lam_l)+c;
@@ -58,8 +52,7 @@ else
     K_0 = -1;
 end
     
-%seems as though, if the else clause in 1st control struct is executed that
-%this would evaluate to random garbage -achille
+
 XS1 = (-C_a^2+C_b^2+C_c*C_b+C_c^2)/(3*(C_b+C_c-C_a))*sqrt(K_0);
 
 YS1 = b^2/V*((t_r*(c/2+b/3*(tan(Lam_t)-tan(Lam_l)))-(t_r-t_t)*(c/3+b/4*(tan(Lam_t)-tan(Lam_l)))));

@@ -13,18 +13,24 @@ ct = c; %chord of horizontal tail(m)
 act = ct*.25; %AC of horizontal tail
 vtailc = c; %chord of vertical tail
 vtailac = vtailc*.25; %AC of vertical tail
-htailc = c;
-vtailac = .25*c;
+htailc = c; % chord of horizontal tail
+htailac = .25*c; % AC of vertical tail
 Clwa = 0.1; %WING 2d lift coefficient and vs alpha
 Clta = Clwa; % TAIL 2d lift coef. and vs alpha
 Aw = 11; At = Aw; % WING & TAIL aspect ratio
 Sw = 0; St = 0;     % WING & TAIL planform area (m^2)
-tapw = 0; tapt = tapw; %Taper for wing and tail
+tapw =  1; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 Clwo = 0; Clto = 0; %Cl at 0 aoa(y axis offset)
 T = 0.1*c; %Airfoil max thickness
 aoarange = -8:1:8; %range of aoa to evaluate over
+wingtapfac = 1; % "wing taper factor", or what fraction of the root thickness is the tip thickness
+tailtapfac = 1; % "tail taper factor", or what fraction of the root thickness is the tip thickness
+wingroot_T = T; % thickness of wing airfoil root
+wingtip_T = wingtapfac*wingroot_T; % thickness of wing airfoil tip
+tailroot_T = T; % thickness of tail airfoil root
+tailtip_T = tailtapfac*tailroot_T; % thickness of tail airfoil tip
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
@@ -118,39 +124,41 @@ for i = 1:n
     Weng = Weng*.4536; %weight of propulsion system (eng and air intake etc)
     
     %nose cone: length,  x position (CG),  z position (CG),  weight
-    nosearr =  [0.5;     0.75;             Df/2;             Wnc;]; 
+    nosearr =  [0.5,     0.75,             Df/2,             Wnc]; 
     
     %tail cone: length,  x position (CG),               z position (CG),  weight
-    tailarr =  [0.5;     nosearr(1)+fuselageL+.25;      Df/2;             Wnc;]; 
+    tailarr =  [0.5,     nosearr(1)+fuselageL+.25,      Df/2,             Wnc]; 
     
     %avioncis: length, x position (CG), z position (CG), weight
-    avioarr = [0;      nosearr(2);      Df/2;            W_avionics;]; 
+    avioarr = [0,      nosearr(2),      Df/2,            W_avionics]; 
     
     %filters:  length,                          x position (CG),  z position (CG), weight
-    filtarr = [fuselageL-nosearr(1)-tailarr(1); fuselageL/2;      Df/2;            Wfilters;];
+    filtarr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wfilters];
     
     %fuselage: length,                          x position (CG),  z position (CG), weight
-    fusearr = [fuselageL-nosearr(1)-tailarr(1); fuselageL/2;      Df/2;            Wf;]; 
+    fusearr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wf]; 
     
     %h. tail:   length, x position (CG), z position (CG), weight
-    htailarr = [htailc; tailarr(2);      Df/2;            Wht;]; 
+    htailarr = [htailc, tailarr(2),      Df/2,            Wht]; 
     
     %engine:  length,  x position (CG),  z position (CG), weight
-    engarr = [Lmot(j); htailarr(2);      Df/2;            Weng;]; 
+    engarr = [Lmot(j), htailarr(2),      Df/2,            Weng]; 
     
     %v. tail:   length, x position (CG),  z position (CG), weight
-    vtailarr = [vtailc; htailarr(2);      Df/2;            Wvt;]; 
+    vtailarr = [vtailc, htailarr(2),      Df/2,            Wvt]; 
     
     %wing:     length, x position (CG),                    z position (CG), weight
-    wingarr = [c;      .4*fuselageL+(.4*fuselageL)/2;      Df/2;            Ww;];
+    wingarr = [c,      .4*fuselageL+(.4*fuselageL)/2,      Df/2,            Ww];
     
     %landing gear: length, x position (CG), z position (CG), weight
-    geararr =     [0;      wingarr(2);      Df/2;            W_landgear;];
+    geararr =     [0,      wingarr(2),      Df/2,            W_landgear];
     
-    % Order:        land gear     nose         avionics       filters       fueselage      h. tail         engine          v. tail          wing
-    Xarmarray =   [ geararr(2)    nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)      tailarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
-    Zarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(1)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
-    weightarray = [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(1)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+    %battery: length, x position (CG), z position (CG), weight
+    battarr =      [0.5,      nosecone(1),   Df/2,            100];
+    %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
+    Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+    Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(2)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+    weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(3)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
     downwash = 0; %downwash effect on tail
     tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
     
@@ -191,14 +199,20 @@ for i = 1:n
     %They don't seem to account for z differences but output z values?
     %in light of previous comment I will not account for vert. tail since
     %it should be inline with fuselage centerline
-    [Ixw, Iyw, Izw, Ixzw] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,Xwing,(bw-Df)/2,Df/2,bw/4 + Df/4);
-    [Ixw2, Iyw2, Izw2, Ixzw2] = wing_inertia(Ww/2,false,phiw,phiw,tapw,tapw,c,Xwing,(bw-Df)/2,Df/2,-bw/4 - Df/4);
-    [Ixt, Iyt, Izt, Ixzt] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
-    [Ixt2, Iyt2, Izt2, Ixzt2] = wing_inertia(Wht/2,true,phit,phit,tapt,tapt,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
-    Ixw = Ixw + Ixw2 + Ixt + Ixt2; %summation of 4 wing intertial contributions
-    Iyw = Iyw + Iyw2 + Iyt + Iyt2;
-    Izw = Izw + Izw2 + Izt + Izt2;
-    Ixzw = Ixzw + Ixzw2 + Ixzt + Ixzt2;
+    
+    % Wing Inertial Contributions
+    % left wing
+    [Ixw, Iyw, Izw, Ixzw] =     wing_inertia(Ww/2,false,phiw,phiw,wingroot_T,wingtip_T,c,Xwing,(bw-Df)/2,Df/2,bw/4 + Df/4);
+    % right wing
+    [Ixw2, Iyw2, Izw2, Ixzw2] = wing_inertia(Ww/2,false,phiw,phiw,wingroot_T,wingtip_T,c,Xwing,(bw-Df)/2,Df/2,-bw/4 - Df/4);
+    % left tail
+    [Ixt, Iyt, Izt, Ixzt] =     wing_inertia(Wht/2,true,phit,phit,tailroot_T,tailtip_T,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
+    % right tail
+    [Ixt2, Iyt2, Izt2, Ixzt2] = wing_inertia(Wht/2,true,phit,phit,tailroot_T,tailtip_T,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
+    % v. tail
+    [Ixvt, Iyvt, Izvt, Ixzvt] = wing_inertia(Wht/2,true,phit,phit,tailroot_T,tailtip_T,ct,Xtail,(bt-Df)/2,Df/2,-bt/4 - Df/4);
+
+    
     
     [Ixe, Iye, Ize, Ixze] = engine_inertia(Weng,Rnac(j),XZmotor,XYmotor,YZmotor,Lmot(j));
     [Ixf, Iyf, Izf, Ixzf] = fuselage_inertia(Df/2,Wnc,Wtc,Wf,XYfuselage,Lnc,Ltc,fuselageL);
@@ -242,10 +256,10 @@ for i = 1:n
     Pbw(i) = Data(i).bw;
 end
 % Add more figures following the format to plot other data
-dataAnalysis(HDf,PDf,'Df');
-dataAnalysis(HWe,PWe,'We');
-dataAnalysis(HPe,PPe,'Pe');
-dataAnalysis(Hbw,Pbw,'bw');
+% dataAnalysis(HDf,PDf,'Df');
+% dataAnalysis(HWe,PWe,'We');
+% dataAnalysis(HPe,PPe,'Pe');
+% dataAnalysis(Hbw,Pbw,'bw');
 
 
 
