@@ -5,7 +5,7 @@ Iy = 0;
 Iz = 0;
 Ixz = 0;
 
-for i=0:length(Ixarray)
+for i=1:length(Ixarray)
     Ix = Ix+Ixarray(i); % adding up Ix arrays
     Iy = Iy+Iyarray(i); % adding up Iy arrays
     Iz = Iz+Izarray(i); % adding up Iz arrays
