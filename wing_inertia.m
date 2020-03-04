@@ -18,8 +18,8 @@ XS4 = wingstart; % x position of start of wing
 
 V = b*(t_r(c+b/2*(tan(Lam_t)-tan(Lam_l)))-(t_r-t_t)*(c/2+b/3*(tan(Lam_t)-tan(Lam_l))));
 
-I_1x = W_s*b^3/V*(((t_r-t_t)*(c/4+b*tan(Lam_t)/5-b*tan(Lam_l)/5))+(t_r*(c/3+b*tan(Lam_t)/4-b*tan(Lam_l)/4)));
-I_1y = W_s*b/V*((t_r*(c^3/3+b*c*tan(Lam_t)*(c/2+b*tan(Lam_t)/3)+b^3/12*(tan(Lam_t)^3-tan(Lam_l)^3)))-((t_r-t_t)*(c^3/6+b*c*tan(Lam_t)*(c/3+b*tan(Lam_t)/4)+b^3/15*(tan(Lam_t)^3-tan(Lam_l)^3))));
+I_1x = W_w*b^3/V*(((t_r-t_t)*(c/4+b*tan(Lam_t)/5-b*tan(Lam_l)/5))+(t_r*(c/3+b*tan(Lam_t)/4-b*tan(Lam_l)/4)));
+I_1y = W_w*b/V*((t_r*(c^3/3+b*c*tan(Lam_t)*(c/2+b*tan(Lam_t)/3)+b^3/12*(tan(Lam_t)^3-tan(Lam_l)^3)))-((t_r-t_t)*(c^3/6+b*c*tan(Lam_t)*(c/3+b*tan(Lam_t)/4)+b^3/15*(tan(Lam_t)^3-tan(Lam_l)^3))));
 I_1z = I_1x+I_1y;
 I_1xz = 0; % != 0 for anhedral or dihedral angles; This isn't even used ?
 
