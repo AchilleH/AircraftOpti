@@ -27,7 +27,7 @@ I_1xz = 0; % != 0 for anhedral or dihedral angles; This isn't even used ?
 %This appears to be some control structure that uses the fuselage parallel
 %sweep distance compared to chord to set some future varibles up
 %also seems as though 1 possibility was not considered, and the else only
-%sets up a value for k leaving the C_values to be not defined.
+%sets up a value for k leaving the C_values to be not defined .
 %-achille
 
 temp1 = b*tan(Lam_l);

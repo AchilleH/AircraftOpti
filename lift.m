@@ -70,7 +70,7 @@ CLta = getCL(beta,nut,phit,St,Sref,Df,bt,ARt);
 qw = .5 .* Vrange.^2 .* rho .* Sw; %L = .5 * rho * v^2 * S * CL
 qt = .5 .* Vrange.^2 .* rho .* St;
 CLw = meshgrid(CLwa,aoa);
-CLt = meshgrid(Clta,aoa);
+CLt = meshgrid(CLta,aoa);
 Lw = meshgrid(qw,aoa);
 Lt = meshgrid(qt,aoa);
 
