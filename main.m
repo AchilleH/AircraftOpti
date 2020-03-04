@@ -13,6 +13,8 @@ ct = c; %chord of horizontal tail(m)
 act = ct*.25; %AC of horizontal tail
 vtailc = c; %chord of vertical tail
 vtailac = vtailc*.25; %AC of vertical tail
+htailc = c;
+vtailac = .25*c;
 Clwa = 0.1; %WING 2d lift coefficient and vs alpha
 Clta = Clwa; % TAIL 2d lift coef. and vs alpha
 Aw = 11; At = Aw; % WING & TAIL aspect ratio
@@ -87,23 +89,44 @@ for i = 1:n
     Wf = Wf*.4536; %fuselage weight
     Wht = Wht*.4536; %horizontal tail weight
     Wvt = Wvt*.4536; %vertical tail weight
-    Weng = Weng*.4536; %weight of propulsion system(eng and air intake etc)
-    nosearr = [0 0 Wnc]; %x position, z position, weight for nose cone
-    avioarr = [2 0 W_avionics]; %x position, z position, weight for avionics
-    filtarr = [2 0 Wfilters]; %x position, z position, weight for filters
-    fusearr = [fuselageL/2 0 Wf]; %x position, z position, weight for fuselage
-    htailarr = [9 0 Wht]; %x position, z position, weight for horizontal tail
-    engarr = [8 0 Weng]; %x position, z position, weight for engine
-    vtailarr = [9 0 Wvt]; %x position, z position, weight for vertical tail
-    wingarr = [3 0 Ww]; %x position, z position, weight for wing
-    geararr = [wingarr(1) 0 W_landgear]; %x position, z position, weight for landing gear
-    tailarr = [9.5 0 Wnc]; %x position, z position, weight for landing gear
+    Weng = Weng*.4536; %weight of propulsion system (eng and air intake etc)
+    
+    %nose cone: length,  x position (CG),  z position (CG),  weight
+    nosearr =  [0.5;     0.75;             Df/2;             Wnc;]; 
+    
+    %tail cone: length,  x position (CG),               z position (CG),  weight
+    tailarr =  [0.5;     nosearr(1)+fuselageL+.25;      Df/2;             Wnc;]; 
+    
+    %avioncis: length, x position (CG), z position (CG), weight
+    avioarr = [0;      nosearr(2);      Df/2;            W_avionics;]; 
+    
+    %filters:  length,                          x position (CG),  z position (CG), weight
+    filtarr = [fuselageL-nosearr(1)-tailarr(1); fuselageL/2;      Df/2;            Wfilters;];
+    
+    %fuselage: length,                          x position (CG),  z position (CG), weight
+    fusearr = [fuselageL-nosearr(1)-tailarr(1); fuselageL/2;      Df/2;            Wf;]; 
+    
+    %h. tail:   length, x position (CG), z position (CG), weight
+    htailarr = [htailc; tailarr(2);      Df/2;            Wht;]; 
+    
+    %engine:  length,  x position (CG),  z position (CG), weight
+    engarr = [Lmot(j); htailarr(2);      Df/2;            Weng;]; 
+    
+    %v. tail:   length, x position (CG),  z position (CG), weight
+    vtailarr = [vtailc; htailarr(2);      Df/2;            Wvt;]; 
+    
+    %wing:     length, x position (CG),                    z position (CG), weight
+    wingarr = [c;      .4*fuselageL+(.4*fuselageL)/2;      Df/2;            Ww;];
+    
+    %landing gear: length, x position (CG), z position (CG), weight
+    geararr =     [0;      wingarr(2);      Df/2;            W_landgear;];
+    
     % Order:        land gear     nose         avionics       filters       fueselage      h. tail         engine          v. tail          wing
-    Xarmarray =   [ geararr(1)    nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)      tailarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+    Xarmarray =   [ geararr(2)    nosearr(1)   avioarr(1)     filtarr(1)    fusearr(1)     htailarr(1)     engarr(1)       vtailarr(1)      wingarr(1)      tailarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
     Zarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(1)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
     weightarray = [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(1)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
     downwash = 0; %downwash effect on tail
-    tailac = wingarr(1)-htailarr(1)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
+    tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
     
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
