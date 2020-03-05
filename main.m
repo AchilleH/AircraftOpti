@@ -85,7 +85,7 @@ for i = 1:n
     %if you add to here, also add to save
     j = ceil(rand()*length(We)); %Chooses a random engine
     PE = Pe(j); %engine power
-    Winv = ((PE-0.75)/(450-0.75))*297 + 3; %inverter weight estimate based on alibaba specs
+    Winv = ((PE/1000-0.75)/(450-0.75))*297 + 3; %inverter weight estimate based on alibaba specs
     Wbat = Wbat + Winv; %adjusted batt weight
 
     Df = rand()*2 + 1; %Df range control
