@@ -77,7 +77,7 @@ Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
 Xeng = 0; %distance of the eng CG wrt fuselage tip
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
-n = 100000; %number of trials to run
+n = 500; %number of trials to run
 
 %The Loop to Run Trials
 for i = 1:n
@@ -86,7 +86,6 @@ for i = 1:n
     j = ceil(rand()*length(We)); %Chooses a random engine
     PE = Pe(j); %engine power
     Winv = ((PE/1000-0.75)/(450-0.75))*297 + 3; %inverter weight estimate based on alibaba specs
-    Wbat = Wbat + Winv; %adjusted batt weight
 
     Df = rand()*2 + 1; %Df range control
     bw = rand()*5 + 10; %wingspan randomizer
@@ -124,7 +123,7 @@ for i = 1:n
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt + T*vtailh;
     %% Niccolai Estimate
-    [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,T/c,V_max*3.281,c*3.281, acw*3.281, act*3.281, vtailac*3.281, ct*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
+    [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,(W_avionics + Winv)*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,T/c,V_max*3.281,c*3.281, acw*3.281, act*3.281, vtailac*3.281, ct*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
     %conversion from lb to kg
     W = W*.4536; %total weight
     Ww = Ww*.4536; %wing weight
@@ -239,7 +238,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin);
+    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv);
 end
 
 %% Spec Verification
