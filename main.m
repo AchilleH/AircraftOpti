@@ -49,11 +49,11 @@ t = Df; %approximate max horizontal thickness along the vertical (m)
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 %Motor info
-Motors = ["180M-2","200L1-2","200L2-2","225M-2","250M-2","280S-2","280M-2","315S-2"];
-Pe = [22000,30000,37000,45000,55000,75000,90000,110000]; %engine power [W]
-We = [165,218,230,280,365,495,565,890]; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
-Rmot = .5* [.455,.505,.505,.560,.615,.680,.680,.845]; %Radius of motor
-Lmot = [.7,.77,.77,.815,.910,.985,1.035,1.185]; %(m) Length of motor
+Motors = ["160M1-2","160M2-2","160L-2","180M-2","200L1-2","200L2-2","225M-2","250M-2","280S-2","280M-2","315S-2"];
+Pe = [11000,15000,18500,22000,30000,37000,45000,55000,75000,90000,110000]; %engine power [W]
+We = [110,120,135,165,218,230,280,365,495,565,890]; %engine weight, engine weight seems to inc by ~53 every 10 hp increase. 365kg for 72 hp
+Rmot = .5* [.420,.420,.420,.455,.505,.505,.560,.615,.680,.680,.845]; %Radius of motor
+Lmot = [.615,.615,.670,.7,.77,.77,.815,.910,.985,1.035,1.185]; %(m) Length of motor
 
 %Stability Specific Variables
 %Weights
