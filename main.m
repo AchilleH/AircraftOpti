@@ -14,7 +14,6 @@ act = ct*.25; %AC of horizontal tail
 vtailc = c; %chord of vertical tail
 vtailac = vtailc*.25; %AC of vertical tail
 htailc = c;
-vtailac = .25*c;
 Clwa = 0.1; %WING 2d lift coefficient and vs alpha
 Clta = Clwa; % TAIL 2d lift coef. and vs alpha
 Aw = 11; At = Aw; % WING & TAIL aspect ratio
@@ -74,6 +73,7 @@ XYmotor = 0; %distance between motor CG and XY plane
 XYfuselage = 0; %distance between XY plane and fuselage centerline
 Xwing = 0.4*fuselageL; %Distance between fuselage tip and tip of wing [m]
 Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
+Xeng = 0; %distance of the eng CG wrt fuselage tip
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
 n = 500; %number of trials to run
@@ -89,6 +89,8 @@ for i = 1:n
     bt = rand()*(bw-7) + 5; %tail wingspan
     c = rand()*1 + 1; %wing chord randomizer
     ct = rand()*(c-0.7) + 0.5; %tail chord randomizer
+    Xeng = rand()*(fuselageL - 0.6*fuselageL) + 0.6*fuselageL; %randomized the location of the motor cg between 0.6 and fuselageL
+    
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
@@ -139,7 +141,7 @@ for i = 1:n
     %h. tail:   length, x position (CG), z position (CG), weight
     htailarr = [htailc, tailarr(2),      Df/2,            Wht]; 
     %engine:  length,  x position (CG),  z position (CG), weight
-    engarr = [Lmot(j), htailarr(2),      Df/2,            Weng]; 
+    engarr = [Lmot(j), Xeng,      Df/2,            Weng]; 
     %v. tail:   length, x position (CG),  z position (CG), weight
     vtailarr = [vtailc, htailarr(2),      Df/2,            Wvt]; 
     %wing:     length, x position (CG),                    z position (CG), weight
@@ -225,7 +227,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,staticmargin);
+    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin);
 end
 
 %% Spec Verification
@@ -239,31 +241,37 @@ HDf = []; %empty arrays bc. i dont want it to saturate the 0 mark
 HWe = [];
 HPe = [];
 Hbw = [];
+HXe = [];
 %All Data Arrays
 PDf = zeros(1,n);
 PWe = zeros(1,n);
 PPe = zeros(1,n);
 Pbw = zeros(1,n);
+PXe = zeros(1,n);
 
 i2 = 1; %for successful trials
 for i = 1:n
     if Data(i).result == true
-        HDf(j) = Data(i).Df; 
-        HWe(j) = Data(i).We;
-        HPe(j) = Data(i).Pe;
-        Hbw(j) = Data(i).bw;
-        j = j+1;
+        HDf(i2) = Data(i).Df; 
+        HWe(i2) = Data(i).We;
+        HPe(i2) = Data(i).Pe;
+        Hbw(i2) = Data(i).bw;
+        HXe(i2) = Data(i).Xeng;
+        i2 = i2+1;
     end
     PDf(i) = Data(i).Df;
     PWe(i) = Data(i).We;
     PPe(i) = Data(i).Pe;
     Pbw(i) = Data(i).bw;
+    PXe(i) = Data(i).Xeng;
 end
 % Add more figures following the format to plot other data
 dataAnalysis(HDf,PDf,'Df');
 dataAnalysis(HWe,PWe,'We');
 dataAnalysis(HPe,PPe,'Pe');
 dataAnalysis(Hbw,Pbw,'bw');
+dataAnalysis(HXe,PXe,'Xeng');
+
 
 
 
