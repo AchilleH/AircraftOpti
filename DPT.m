@@ -40,8 +40,8 @@ Di = zeros(n,m);
 Do = zeros(n,m);
 for nn = 1:n
 %%%Calculating Induced Drag Coefficient
-    CDiw = (CLw([nn],:).^2)/pi/Aw/ew;      % CLw = coef. of lift of wing
-    CDit = (CLt([nn],:).^2)/pi/At/et;      % CLt = coef. of lift of tail
+    CDiw = (CLw(nn,:).^2)/pi/Aw/ew;      % CLw = coef. of lift of wing
+    CDit = (CLt(nn,:).^2)/pi/At/et;      % CLt = coef. of lift of tail
     %%%Total Induced Drag Coefficient, CDi
     CDi(nn,:) = CDiw + (St/Sw)*CDit;
 %%%Calculating Parasitic Drag Coefficient

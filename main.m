@@ -60,7 +60,7 @@ Wnc = 0; %weight of nosecone [kg]
 Wtc = 0; %weight of tailcone [kg]
 W_guess= Wb;
 W_landgear = 7;
-Wbat = 100; %weight of the batteries [kg]
+Wbat = 128; %weight of the batteries [kg]
 W_avionics = 20 + Wbat;
 %Lengths
 Lnc = 0;%length of nosecone [m]
