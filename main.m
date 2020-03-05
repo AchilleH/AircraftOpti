@@ -87,6 +87,8 @@ for i = 1:n
     Df = rand()*2 + 1; %Df range control
     bw = rand()*5 + 10; %wingspan randomizer
     bt = rand()*(bw-7) + 5; %tail wingspan
+    c = rand()*1 + 1; %wing chord randomizer
+    ct = rand()*(c-0.7) + 0.5; %tail chord randomizer
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
@@ -127,7 +129,7 @@ for i = 1:n
     %nose cone: length,  x position (CG),  z position (CG),  weight
     nosearr =  [0.5,     .75*0.5,             Df/2,             Wnc];
     %tail cone: length,  x position (CG),               z position (CG),  weight
-    tailarr =  [0.5,     nosearr(1)+fuselageL+.25,      Df/2,             Wtc]; 
+    tailarr =  [0.5,     fuselageL-nosearr(1)+.25,      Df/2,             Wtc]; 
     %avioncis: length, x position (CG), z position (CG), weight
     avioarr = [0,      nosearr(2),      Df/2,            W_avionics]; 
     %filters:  length,                          x position (CG),  z position (CG), weight
@@ -169,10 +171,10 @@ for i = 1:n
     [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
     
     %% Neutral Point
-    [hn] = neutral_point(acw + Xwing/c, act + Xtail/c, St, Sw, CLta, CLwa, downwash);
+    [hn] = neutral_point(acw, act + (Xtail-Xwing), St, Sw, CLta, CLwa, downwash);
     
     %% Static Margin
-    staticmargin = XCG/c-hn;
+    staticmargin = (XCG-Xwing)/c - hn;
     
     %% Wing, Engine, Fuselage Inertias
     %Wing inertia (type is bool, 0 = wing, 1 = tail)
