@@ -143,15 +143,15 @@ for i = 1:n
     %fuselage: length,                          x position (CG),  z position (CG), weight
     fusearr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wf];
     %h. tail:   length, x position (CG), z position (CG), weight
-    htailarr = [htailc, Xtail + acw,      Df/2,            Wht];
+    htailarr = [htailc, Xtail + act,      Df/2,            Wht];
     %engine:  length,  x position (CG),  z position (CG), weight
     engarr = [Lmot(j), Xeng,      Df/2,            Weng];
     %v. tail:   length, x position (CG),  z position (CG), weight
-    vtailarr = [vtailc, Xtail + acw,      Df/2,            Wvt];
+    vtailarr = [vtailc, Xtail + act,      Df/2,            Wvt];
     %wing:     length, x position (CG),                    z position (CG), weight
-    wingarr = [c,      Xwing/2 + act,      Df/2,            Ww];
+    wingarr = [c,      Xwing/2 + acw,      Df/2,            Ww];
     %landing gear: length, x position (CG), z position (CG), weight
-    geararr =     [0,      Xwing/2 + act,      Df/2,            W_landgear];
+    geararr =     [0,      Xwing/2 + acw,      Df/2,            W_landgear];
     %battery: length, x position (CG), z position (CG), weight
     battarr =      [0.5,      nosearr(1),   Df/2,            Wbat];
     % doubling up filters if leftover diameter with one filter is more than
