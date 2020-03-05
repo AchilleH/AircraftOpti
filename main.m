@@ -77,7 +77,7 @@ Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
 Xeng = 0; %distance of the eng CG wrt fuselage tip
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
-n = 500; %number of trials to run
+n = 5000; %number of trials to run
 
 %The Loop to Run Trials
 for i = 1:n
@@ -89,8 +89,8 @@ for i = 1:n
 
     Df = rand()*2 + 1; %Df range control
     bw = rand()*5 + 10; %wingspan randomizer
-    t = bw; %approximate max horizontal thickness along the vertical (m)
-    bt = rand()*(bw-7) + 5; %tail wingspan
+    t = bw + Df; %approximate max horizontal thickness along the vertical (m)
+    bt = rand()*(bw-7) + 2; %tail wingspan
     c = rand()*1 + 1; %wing chord randomizer
     ct = rand()*(c-0.7) + 0.5; %tail chord randomizer
 
@@ -143,15 +143,15 @@ for i = 1:n
     %fuselage: length,                          x position (CG),  z position (CG), weight
     fusearr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wf];
     %h. tail:   length, x position (CG), z position (CG), weight
-    htailarr = [htailc, tailarr(2),      Df/2,            Wht];
+    htailarr = [htailc, Xtail + acw,      Df/2,            Wht];
     %engine:  length,  x position (CG),  z position (CG), weight
     engarr = [Lmot(j), Xeng,      Df/2,            Weng];
     %v. tail:   length, x position (CG),  z position (CG), weight
-    vtailarr = [vtailc, htailarr(2),      Df/2,            Wvt];
+    vtailarr = [vtailc, Xtail + acw,      Df/2,            Wvt];
     %wing:     length, x position (CG),                    z position (CG), weight
-    wingarr = [c,      .4*fuselageL+(.4*fuselageL)/2,      Df/2,            Ww];
+    wingarr = [c,      Xwing/2 + act,      Df/2,            Ww];
     %landing gear: length, x position (CG), z position (CG), weight
-    geararr =     [0,      wingarr(2),      Df/2,            W_landgear];
+    geararr =     [0,      Xwing/2 + act,      Df/2,            W_landgear];
     %battery: length, x position (CG), z position (CG), weight
     battarr =      [0.5,      nosearr(1),   Df/2,            Wbat];
     % doubling up filters if leftover diameter with one filter is more than
@@ -166,7 +166,7 @@ for i = 1:n
     Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(3)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
     weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(4)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
     downwash = 0; %downwash effect on tail
-    tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
+    tailac = htailarr(2)-wingarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
@@ -251,13 +251,13 @@ end
 HDf = []; %empty arrays bc. i dont want it to saturate the 0 mark
 HWe = [];
 HPe = [];
-Hbw = [];
+Hbt = [];
 HXe = [];
 %All Data Arrays
 PDf = zeros(1,n);
 PWe = zeros(1,n);
 PPe = zeros(1,n);
-Pbw = zeros(1,n);
+Pbt = zeros(1,n);
 PXe = zeros(1,n);
 
 i2 = 1; %for successful trials
@@ -266,19 +266,19 @@ for i = 1:n
         HDf(i2) = Data(i).Df;
         HWe(i2) = Data(i).We;
         HPe(i2) = Data(i).Pe;
-        Hbw(i2) = Data(i).bw;
+        Hbt(i2) = Data(i).bt;
         HXe(i2) = Data(i).Xeng;
         i2 = i2+1;
     end
     PDf(i) = Data(i).Df;
     PWe(i) = Data(i).We;
     PPe(i) = Data(i).Pe;
-    Pbw(i) = Data(i).bw;
+    Pbt(i) = Data(i).bt;
     PXe(i) = Data(i).Xeng;
 end
 % Add more figures following the format to plot other data
 dataAnalysis(HDf,PDf,'Df');
 dataAnalysis(HWe,PWe,'We');
 dataAnalysis(HPe,PPe,'Pe');
-dataAnalysis(Hbw,Pbw,'bw');
+dataAnalysis(Hbt,Pbt,'bt');
 dataAnalysis(HXe,PXe,'Xeng');
