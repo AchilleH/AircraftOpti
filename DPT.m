@@ -1,4 +1,4 @@
-function [CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,ew,et,t,c,Y,CLw,CLt,xdivc,V)
+function [CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr] = DPT(n,PE,CL,W,Swet,Sref,Aw,Sw,At,St,ew,et,t,c,Y,CLw,CLt,xdivc,V)
 %Use length of aircraft for c
 
 %%%154A Drag Block
@@ -41,7 +41,7 @@ Do = zeros(n,m);
 for nn = 1:n
 %%%Calculating Induced Drag Coefficient
     CDiw = (CLw(nn,:).^2)/pi/Aw/ew;      % CLw = coef. of lift of wing
-    CDit = (CLt(nn,:).^2)/pi/At/et;      % CLt = coef. of lift of tail
+    CDit = (CLt(nn,:).^2)/pi/At/et;      % CLt = coef. of lift of tail 
     %%%Total Induced Drag Coefficient, CDi
     CDi(nn,:) = CDiw + (St/Sw)*CDit;
 %%%Calculating Parasitic Drag Coefficient
@@ -126,5 +126,7 @@ end
     CD = CDi + CDo;
     D = q.*CD;
     Di = q.*CDi;
+    Dis = W^2./(q.*pi.*Aw.*ew);
     Do = q.*CDo;
+    Ds = Dis + Do;
 end

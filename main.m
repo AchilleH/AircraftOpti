@@ -3,7 +3,6 @@ clc; clear; close all;
 %% CONSTANTS
 rho = 1.18; % Air density kg/m^3
 V = 0:100;       %aircraft velocity (m/s)
-doubledup = 0; % tracker to see how many times filter doubling up happened
 %% Variables
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
@@ -38,6 +37,7 @@ Wprefilter = 1.2224;
 Wcarbonfilter = 2.5;
 Whyperhepafilter = 2.1044;
 Wfilters = ModNum*(Wprefilter+Wcarbonfilter+Whyperhepafilter); %weight of all filters in kg
+doubledup = 0; % tracker to see how many times filter doubling up happened
 h = 1.8;       %height of aircraft (m)
 C = 10; %Battery Capacity (assuming LiPo Batteries)
 xdivc = .7;   %chord wise position of max thickness (m)
@@ -149,13 +149,6 @@ for i = 1:n
     geararr =     [0,      wingarr(2),      Df/2,            W_landgear];
     %battery: length, x position (CG), z position (CG), weight
     battarr =      [0.5,      nosearr(1),   Df/2,            Wbat];
-    %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
-    Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(2)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
-    Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(3)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
-    weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(4)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
-    downwash = 0; %downwash effect on tail
-    tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
-    
     % doubling up filters if leftover diameter with one filter is more than
     % 5/8ths the diameter (somewhat arbitrary, can be changed to another
     % preference)
@@ -163,6 +156,12 @@ for i = 1:n
         filtarr(2) = filtarr(2)/2; % halves CG location
         doubledup = doubledup+1; % counts one doubling up
     end
+    %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
+    Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(2)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+    Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(3)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+    weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(4)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+    downwash = 0; %downwash effect on tail
+    tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
     
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
@@ -173,7 +172,7 @@ for i = 1:n
     k = 1/(pi*Aw*S);
 
     %% Drag, second Swet is input for Sref in DPT
-    [CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr] = DPT(length(aoarange),PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
+    [CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr] = DPT(length(aoarange),PE,CL,W,Swet,Swet,Aw,Sw,At,St,ew,et,t,c,phiw,CLw,CLt,xdivc,V);
     %% Performance
     [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead);
     %% CG
@@ -234,7 +233,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Di,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin);
+    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin);
 end
 
 %% Spec Verification
