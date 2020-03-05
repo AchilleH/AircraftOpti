@@ -6,3 +6,6 @@ goal is to incorporate stability funcitons into main script as well as have the 
 
 TODO:
 - Run and get values
+
+Notes:
+Matlab's git implementation is garbage
