@@ -12,6 +12,7 @@ ct = c; %chord of horizontal tail(m)
 act = ct*.25; %AC of horizontal tail
 vtailc = c; %chord of vertical tail
 vtailac = vtailc*.25; %AC of vertical tail
+vtailh = 1.5*vtailc;
 htailc = c;
 Clwa = 0.1; %WING 2d lift coefficient and vs alpha
 Clta = Clwa; % TAIL 2d lift coef. and vs alpha
@@ -44,7 +45,7 @@ xdivc = .7;   %chord wise position of max thickness (m)
 Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
 depthf = 0.02; %thickness of fuselage
-t = Df; %approximate max horizontal thickness along the vertical (m)
+t = bw; %approximate max horizontal thickness along the vertical (m)
 Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 %Motor info
@@ -76,7 +77,7 @@ Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
 Xeng = 0; %distance of the eng CG wrt fuselage tip
 %Trial Variables to Save data
 %Can't seem to find an easy/worthwhile way to preallocate for structs
-n = 500; %number of trials to run
+n = 100000; %number of trials to run
 
 %The Loop to Run Trials
 for i = 1:n
@@ -84,11 +85,16 @@ for i = 1:n
     %if you add to here, also add to save
     j = ceil(rand()*length(We)); %Chooses a random engine
     PE = Pe(j); %engine power
+    Winv = ((PE-0.75)/(450-0.75))*297 + 3; %inverter weight estimate based on alibaba specs
+    Wbat = Wbat + Winv; %adjusted batt weight
+
     Df = rand()*2 + 1; %Df range control
     bw = rand()*5 + 10; %wingspan randomizer
+    t = bw; %approximate max horizontal thickness along the vertical (m)
     bt = rand()*(bw-7) + 5; %tail wingspan
     c = rand()*1 + 1; %wing chord randomizer
     ct = rand()*(c-0.7) + 0.5; %tail chord randomizer
+
     Xeng = rand()*(fuselageL - 0.6*fuselageL) + 0.6*fuselageL; %randomized the location of the motor cg between 0.6 and fuselageL
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
@@ -116,7 +122,7 @@ for i = 1:n
         Sref = Sw;
     end
     %Recalculating Swet for changing fuselage diameter
-    Swet = pi*(Df/2)^2 + T*bw + T*bt;
+    Swet = pi*(Df/2)^2 + T*bw + T*bt + T*vtailh;
     %% Niccolai Estimate
     [W, Ww, Wf, Wht, Wvt, Weng] = weight_viability(W_guess*2.205,Wfilters*2.205,W_avionics*2.205,W_landgear*2.205,We(j)*2.205,Aw,Sw*3.281^2,St*3.281^2,St*3.281^2,bt*3.281,bt*3.281,tapw,T/c,V_max*3.281,c*3.281, acw*3.281, act*3.281, vtailac*3.281, ct*3.281, vtailc*3.281,fuselageL*3.281,Df*3.281,depthf*3.281);
     %conversion from lb to kg
@@ -126,23 +132,23 @@ for i = 1:n
     Wht = Wht*.4536; %horizontal tail weight
     Wvt = Wvt*.4536; %vertical tail weight
     Weng = Weng*.4536; %weight of propulsion system (eng and air intake etc)
-    
+
     %nose cone: length,  x position (CG),  z position (CG),  weight
     nosearr =  [0.5,     .75*0.5,             Df/2,             Wnc];
     %tail cone: length,  x position (CG),               z position (CG),  weight
-    tailarr =  [0.5,     fuselageL-nosearr(1)+.25,      Df/2,             Wtc]; 
+    tailarr =  [0.5,     fuselageL-nosearr(1)+.25,      Df/2,             Wtc];
     %avioncis: length, x position (CG), z position (CG), weight
-    avioarr = [0,      nosearr(2),      Df/2,            W_avionics]; 
+    avioarr = [0,      nosearr(2),      Df/2,            W_avionics];
     %filters:  length,                          x position (CG),  z position (CG), weight
-    filtarr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wfilters];
+    filtarr = [fuselageL-nosearr(1)-tailarr(1), nosearr(1)+(fuselageL-nosearr(1)-tailarr(1)/2),      Df/2,            Wfilters];
     %fuselage: length,                          x position (CG),  z position (CG), weight
-    fusearr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wf]; 
+    fusearr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wf];
     %h. tail:   length, x position (CG), z position (CG), weight
-    htailarr = [htailc, tailarr(2),      Df/2,            Wht]; 
+    htailarr = [htailc, tailarr(2),      Df/2,            Wht];
     %engine:  length,  x position (CG),  z position (CG), weight
-    engarr = [Lmot(j), Xeng,      Df/2,            Weng]; 
+    engarr = [Lmot(j), Xeng,      Df/2,            Weng];
     %v. tail:   length, x position (CG),  z position (CG), weight
-    vtailarr = [vtailc, htailarr(2),      Df/2,            Wvt]; 
+    vtailarr = [vtailc, htailarr(2),      Df/2,            Wvt];
     %wing:     length, x position (CG),                    z position (CG), weight
     wingarr = [c,      .4*fuselageL+(.4*fuselageL)/2,      Df/2,            Ww];
     %landing gear: length, x position (CG), z position (CG), weight
@@ -153,16 +159,16 @@ for i = 1:n
     % 5/8ths the diameter (somewhat arbitrary, can be changed to another
     % preference)
     if Df-.33 >= Df*5/8
-        filtarr(2) = filtarr(2)/2; % halves CG location
+        filtarr(2) = nosearr(1)+(fuselageL-nosearr(1)-tailarr(1)/4); % halves effect of filters on CG location
         doubledup = doubledup+1; % counts one doubling up
     end
-    %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
+    %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery
     Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(2)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
     Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(3)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
     weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(4)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
     downwash = 0; %downwash effect on tail
     tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
-    
+
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
     L = Lw + Lt;
@@ -177,19 +183,19 @@ for i = 1:n
     [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead);
     %% CG
     [XCG,ZCG,Wtotal] = CG_calc(Xarmarray,Zarmarray,weightarray);
-    
+
     %% Neutral Point
     [hn] = neutral_point(acw, act + (Xtail-Xwing), St, Sw, CLta, CLwa, downwash);
-    
+
     %% Static Margin
     staticmargin = (XCG-Xwing)/c - hn;
-    
+
     %% Wing, Engine, Fuselage Inertias
     %Wing inertia (type is bool, 0 = wing, 1 = tail)
     %Wing inertia seems to need at least 2 calls, maybe 4?
     %somehow they need to find their way into the final array
     %how that will affect the final calc who tf knows
-    
+
     %Assumptions
     %assuming we need 4 calls (that the function only evaluates over 1 wing), so for wing weight val, dividing by 2
     %assuming planetoCG only cares about y dist, since were aiming for 0
@@ -200,7 +206,7 @@ for i = 1:n
     %They don't seem to account for z differences but output z values?
     %in light of previous comment I will not account for vert. tail since
     %it should be inline with fuselage centerline
-    
+
     % Wing Inertial Contributions
     % left wing
     [Ixw, Iyw, Izw, Ixzw] =     wing_inertia(Ww/2,false,phiw,phiw,wingroot_T,wingtip_T,c,Xwing,(bw-Df)/2,Df/2,bw/4 + Df/4);
@@ -224,7 +230,7 @@ for i = 1:n
     [Ixlgear, Iylgear, Izlgear, Ixzlgear] = point_inertia(avioarr(4),avioarr(2),0,avioarr(3));
     % batteries
     [Ixbatt, Iybatt, Izbatt, Ixzbatt] = box_inertia(battarr(4),battarr(1),Df,battarr(3),battarr(2));
-    
+
     Ixtot = Ixw+Ixw2+Ixt+Ixt2+Ixvt+Ixe+Ixf+Ixfilt+Ixavi+Ixlgear+Ixbatt;
     Iytot = Iyw+Iyw2+Iyt+Iyt2+Iyvt+Iye+Iyf+Iyfilt+Iyavi+Iylgear+Iybatt;
     Iztot = Izw+Izw2+Izt+Izt2+Izvt+Ize+Izf+Izfilt+Izavi+Izlgear+Izbatt;
@@ -258,7 +264,7 @@ PXe = zeros(1,n);
 i2 = 1; %for successful trials
 for i = 1:n
     if Data(i).result == true
-        HDf(i2) = Data(i).Df; 
+        HDf(i2) = Data(i).Df;
         HWe(i2) = Data(i).We;
         HPe(i2) = Data(i).Pe;
         Hbw(i2) = Data(i).bw;
@@ -277,8 +283,3 @@ dataAnalysis(HWe,PWe,'We');
 dataAnalysis(HPe,PPe,'Pe');
 dataAnalysis(Hbw,Pbw,'bw');
 dataAnalysis(HXe,PXe,'Xeng');
-
-
-
-
-
