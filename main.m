@@ -3,7 +3,7 @@ clc; clear; close all;
 %% CONSTANTS
 rho = 1.18; % Air density kg/m^3
 V = 0:100;       %aircraft velocity (m/s)
-
+doubledup = 0; % tracker to see how many times filter doubling up happened
 %% Variables
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
@@ -90,7 +90,6 @@ for i = 1:n
     c = rand()*1 + 1; %wing chord randomizer
     ct = rand()*(c-0.7) + 0.5; %tail chord randomizer
     Xeng = rand()*(fuselageL - 0.6*fuselageL) + 0.6*fuselageL; %randomized the location of the motor cg between 0.6 and fuselageL
-    
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
@@ -156,6 +155,14 @@ for i = 1:n
     weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(4)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
     downwash = 0; %downwash effect on tail
     tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
+    
+    % doubling up filters if leftover diameter with one filter is more than
+    % 5/8ths the diameter (somewhat arbitrary, can be changed to another
+    % preference)
+    if Df-.33 >= Df*5/8
+        filtarr(2) = filtarr(2)/2; % halves CG location
+        doubledup = doubledup+1; % counts one doubling up
+    end
     
     %% Lift
     [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
