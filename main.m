@@ -62,7 +62,7 @@ Wtc = 0; %weight of tailcone [kg]
 W_guess= Wb;
 W_landgear = 7;
 Wbat = 100; %weight of the batteries [kg]
-W_avionics = 7 + Wbat;
+W_avionics = 20 + Wbat;
 %Lengths
 Lnc = 0;%length of nosecone [m]
 Ltc = 0;%length of tailcone [m]
@@ -127,7 +127,7 @@ for i = 1:n
     %nose cone: length,  x position (CG),  z position (CG),  weight
     nosearr =  [0.5,     .75*0.5,             Df/2,             Wnc];
     %tail cone: length,  x position (CG),               z position (CG),  weight
-    tailarr =  [0.5,     nosearr(1)+fuselageL+.25,      Df/2,             Wnc]; 
+    tailarr =  [0.5,     nosearr(1)+fuselageL+.25,      Df/2,             Wtc]; 
     %avioncis: length, x position (CG), z position (CG), weight
     avioarr = [0,      nosearr(2),      Df/2,            W_avionics]; 
     %filters:  length,                          x position (CG),  z position (CG), weight
@@ -147,9 +147,9 @@ for i = 1:n
     %battery: length, x position (CG), z position (CG), weight
     battarr =      [0.5,      nosearr(1),   Df/2,            Wbat];
     %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery   
-    Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(1)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
-    Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(2)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
-    weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(3)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
+    Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(2)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
+    Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(3)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
+    weightarray = [ geararr(4)    nosearr(4)   avioarr(4)     filtarr(4)    fusearr(4)     htailarr(4)     engarr(4)       vtailarr(4)      wingarr(4)      tailarr(4)    battarr(4)];     % masses of subsystems in aircraft USED FOR INERTIAL AND CG CALC
     downwash = 0; %downwash effect on tail
     tailac = wingarr(2)-htailarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
     
