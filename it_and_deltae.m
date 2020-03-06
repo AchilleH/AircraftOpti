@@ -1,6 +1,8 @@
 function [i_t, delta_e] = it_and_deltae(Data, rho, downwash, aoa, CMdelta_e, CLdelta_e)
 
 % function calculates i_t and delta_e for TRIMMED FLIGHT (L = W)
+% still needs air density, range for angle of attack, and elevator airfoil
+% CM and CL to be user-defined
 
 at = Data.CLta; % lift-curve slope for tail
 aw = Data.CLwa; % lift-curve slope for wing
@@ -18,8 +20,7 @@ VH = -staticmargin*St/Sw; % tail volume ratio
 % deterimining i_t from total lift equation on Lecture 10 Slide 251
 i_t = 1/at*Sw/St*(Wtotal/(q*Sw)-(aw+at*St/Sw*(1-epsal))*aoa);
 
-% determining elevator deflection from Lecture 10 Slide 253 (needs a lot of
-% intermediate calculations, NEEDS CM AND CL for elevator to be user-defined)
+% determining elevator deflection from Lecture 10 Slide 253
 
 % total lift-curve slope
 CLa_tot = aw+at*St/Sw*(1-epsal); 
