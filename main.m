@@ -46,7 +46,6 @@ Sref = Sw;   %Reference Surface Area
 Df = 1;      %diameter of fuselage
 depthf = 0.02; %thickness of fuselage
 t = bw; %approximate max horizontal thickness along the vertical (m)
-Vstall = 15.5;%m/s
 Vhead = 0; %headwind
 %Motor info
 Motors = ["160M1-2","160M2-2","160L-2","180M-2","200L1-2","200L2-2","225M-2","250M-2","280S-2","280M-2","315S-2"];
@@ -66,7 +65,7 @@ W_avionics = 20 + Wbat;
 %Lengths
 Lnc = 0;%length of nosecone [m]
 Ltc = 0;%length of tailcone [m]
-Lfilters = 4; % [m] length of the filter array (assuming it's arranged in two long rows parallel w/fuselage
+Lfilters = 4.3; % [m] length of the filter array (assuming it's arranged in two long rows parallel w/fuselage
 fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
 V_max = max(V); % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
 Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diameter than motor
@@ -84,17 +83,20 @@ n = 5000; %number of trials to run
 for i = 1:n
     %% Calculation Control
     %if you add to here, also add to save
-    j = ceil(rand()*length(We)); %Chooses a random engine
+    %j = ceil(rand()*(length(We) - 5)); %Chooses a random engine, now the last 5 removed due to impossible geometry
+    j = 1;
     PE = Pe(j); %engine power
     Winv = ((PE/1000-0.75)/(450-0.75))*297 + 3; %inverter weight estimate based on alibaba specs
 
     %Df = rand()*2 + 1; %Df range control
-    bw = rand()*5 + 10; %wingspan randomizer
+    %bw = rand()*5 + 10; %wingspan randomizer
+    bw = 10; %Value settled on between trial data and mission specs
     t = bw + Df; %approximate max horizontal thickness along the vertical (m)
-    bt = rand()*(bw-7) + 2; %tail wingspan
+    bt = 0.7*bw; %current final bt/bw ratio based on optimization
+    %bt = rand()*(bw-7) + 2; %tail wingspan
     c = 2*bw/(Aw*(1+tapw));
     ct = 2*bt/(At*(1+tapt));
-    
+
     %Redefining chord dependedent variables
     acw = .25*c; %AC of wing chord
     act = ct*.25; %AC of horizontal tail
@@ -104,8 +106,12 @@ for i = 1:n
     htailc = c;
     Sw = bw*((c+tapw*c)/2);
     St = bt*((ct+tapt*ct)/2);
-    
-    Xeng = rand()*(fuselageL - 4.5 - Lmot(j)/2) + 4.5 + Lmot(j)/2; %randomized the location of the motor cg between 0.6 and fuselageL
+
+    fuselageL = rand()*(10000 - 4.5 - Lmot(j)) + 5 + Lmot(j);
+    Xeng = fuselageL - Lmot(j)/2;
+    %Xeng = rand()*(fuselageL - 4.5 - Lmot(j)/2) + 4.5 + Lmot(j)/2; %randomized the location of the motor cg between 0.6 and fuselageL
+    Xwing = 0.4*fuselageL; %Distance between fuselage tip and tip of wing [m]
+    Xtail = 0.9*fuselageL; %distance between fuselage tip and tip of tail [m]
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
@@ -243,7 +249,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    Data(i) = Save(c,ct,Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv);
+    Data(i) = Save(fuselageL,c,ct,Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv);
 end
 
 %% Spec Verification
@@ -252,35 +258,37 @@ for i = 1:n
 end
 %% Result Plotting
 %Preallocate arrays to hold histogram data here
-%Successful Data arrays
-HDf = []; %empty arrays bc. i dont want it to saturate the 0 mark
-HWe = [];
-HPe = [];
-Hbt = [];
-HXe = [];
+
+%Successful Data arrays begin with 'H'
+%No preallocation for success arrays because it would saturate some number
+%likely zero if you use zeros()
+
 %All Data Arrays
-PDf = zeros(1,n);
 PWe = zeros(1,n);
 PPe = zeros(1,n);
-Pbt = zeros(1,n);
 PXe = zeros(1,n);
+PTL = zeros(1,n);
+PWT = zeros(1,n);
 
 i2 = 1; %for successful trials
 for i = 1:n
     if Data(i).result == true
         HWe(i2) = Data(i).We;
-        HPe(i2) = Data(i).Pe;
-        Hbt(i2) = Data(i).bt;
-        HXe(i2) = Data(i).Xeng;
+        HPe(i2) = max(Data(i).Vstall);
+        HWT(i2) = max(Data(i).Emax);
+ %       HXe(i2) = Data(i).Xeng;
+        HTL(i2) = Data(i).fuselageL;
         i2 = i2+1;
     end
     PWe(i) = Data(i).We;
-    PPe(i) = Data(i).Pe;
-    Pbt(i) = Data(i).bt;
-    PXe(i) = Data(i).Xeng;
+    PPe(i) = max(Data(i).Vstall);
+    PWT(i) = max(Data(i).Emax);
+    PTL(i) = Data(i).fuselageL;
+  %  PXe(i) = Data(i).Xeng;
 end
 % Add more figures following the format to plot other data
 dataAnalysis(HWe,PWe,'We');
-dataAnalysis(HPe,PPe,'Pe');
-dataAnalysis(Hbt,Pbt,'bt');
-dataAnalysis(HXe,PXe,'Xeng');
+dataAnalysis(HPe,PPe,'Max Vstall');
+dataAnalysis(HWT,PWT,'Max Endurance');
+%dataAnalysis(HXe,PXe,'Xeng');
+dataAnalysis(HTL,PTL,'Fuselage Length');
