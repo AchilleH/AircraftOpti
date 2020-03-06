@@ -1,5 +1,7 @@
-function [Data] = Save(Df,M,Rm,Lm,We,Pe,Rnac,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv)
+function [Data] = Save(c,ct,Df,M,Rm,Lm,We,Pe,Rnac,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv)
 %% Physical Characteristics
+Data.c = c;
+Data.ct = ct;
 Data.Df = Df;
 Data.Motor = M;
 Data.MotorRadius = Rm;

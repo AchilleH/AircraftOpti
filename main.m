@@ -6,9 +6,9 @@ V = 0:100;       %aircraft velocity (m/s)
 %% Variables
 %AIRFOIL DATA
 %NACA 1412 w/flap 8deg aoa default
-c = 1;       %chord of aircraft wing(m)
+c = 1;       %chord of aircraft wing at the root (m)
 acw = .25*c; %AC of wing chord
-ct = c; %chord of horizontal tail(m)
+ct = c; %chord of horizontal tail at the root (m)
 act = ct*.25; %AC of horizontal tail
 vtailc = c; %chord of vertical tail
 vtailac = vtailc*.25; %AC of vertical tail
@@ -67,7 +67,7 @@ W_avionics = 20 + Wbat;
 Lnc = 0;%length of nosecone [m]
 Ltc = 0;%length of tailcone [m]
 Lfilters = 4; % [m] length of the filter array (assuming it's arranged in two long rows parallel w/fuselage
-fuselageL = 15; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
+fuselageL = 10; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
 V_max = max(V); % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
 Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diameter than motor
 XZmotor = 0; %distance between motor CG and XZplane
@@ -88,14 +88,13 @@ for i = 1:n
     PE = Pe(j); %engine power
     Winv = ((PE/1000-0.75)/(450-0.75))*297 + 3; %inverter weight estimate based on alibaba specs
 
-    Df = rand()*2 + 1; %Df range control
+    %Df = rand()*2 + 1; %Df range control
     bw = rand()*5 + 10; %wingspan randomizer
     t = bw + Df; %approximate max horizontal thickness along the vertical (m)
     bt = rand()*(bw-7) + 2; %tail wingspan
+    c = 2*bw/(Aw*(1+tapw));
+    ct = 2*bt/(At*(1+tapt));
     
- 
-    c = rand()*1 + 1; %wing chord randomizer
-    ct = rand()*(c-0.7) + 0.5; %tail chord randomizer
     %Redefining chord dependedent variables
     acw = .25*c; %AC of wing chord
     act = ct*.25; %AC of horizontal tail
@@ -103,14 +102,10 @@ for i = 1:n
     vtailac = vtailc*.25; %AC of vertical tail
     vtailh = 1.5*vtailc;
     htailc = c;
-    if(phiw == 0 && tapw == 0) %box wing check
-      Sw = bw*c;
-    end
-    if(phit == 0 && tapt == 0) %box wing check
-      St = bt*ct;
-    end
+    Sw = bw*((c+tapw*c)/2);
+    St = bt*((ct+tapt*ct)/2);
     
-    Xeng = rand()*(fuselageL - 0.6*fuselageL - Lmot(j)/2) + 0.6*fuselageL; %randomized the location of the motor cg between 0.6 and fuselageL
+    Xeng = rand()*(fuselageL - 4.5 - Lmot(j)/2) + 4.5 + Lmot(j)/2; %randomized the location of the motor cg between 0.6 and fuselageL
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
@@ -248,7 +243,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    Data(i) = Save(Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv);
+    Data(i) = Save(c,ct,Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv);
 end
 
 %% Spec Verification
@@ -273,21 +268,18 @@ PXe = zeros(1,n);
 i2 = 1; %for successful trials
 for i = 1:n
     if Data(i).result == true
-        HDf(i2) = Data(i).Df;
         HWe(i2) = Data(i).We;
         HPe(i2) = Data(i).Pe;
         Hbt(i2) = Data(i).bt;
         HXe(i2) = Data(i).Xeng;
         i2 = i2+1;
     end
-    PDf(i) = Data(i).Df;
     PWe(i) = Data(i).We;
     PPe(i) = Data(i).Pe;
     Pbt(i) = Data(i).bt;
     PXe(i) = Data(i).Xeng;
 end
 % Add more figures following the format to plot other data
-dataAnalysis(HDf,PDf,'Df');
 dataAnalysis(HWe,PWe,'We');
 dataAnalysis(HPe,PPe,'Pe');
 dataAnalysis(Hbt,Pbt,'bt');
