@@ -66,6 +66,7 @@ W_avionics = 20 + Wbat;
 %Lengths
 Lnc = 0;%length of nosecone [m]
 Ltc = 0;%length of tailcone [m]
+Lfilters = 4; % [m] length of the filter array (assuming it's arranged in two long rows parallel w/fuselage
 fuselageL = 15; % Length of the fuselage from tip USED IN NEUTRAL POINT CALC [m]
 V_max = max(V); % max velocity USED IN NICCOLAI, NEEDS TO BE RECONSIDERED!
 Rnac = Rmot + .1; %radius of nacelle (motor housing) ASSUMING: 10cm larger diameter than motor
@@ -91,9 +92,24 @@ for i = 1:n
     bw = rand()*5 + 10; %wingspan randomizer
     t = bw + Df; %approximate max horizontal thickness along the vertical (m)
     bt = rand()*(bw-7) + 2; %tail wingspan
+    
+ 
     c = rand()*1 + 1; %wing chord randomizer
     ct = rand()*(c-0.7) + 0.5; %tail chord randomizer
-
+    %Redefining chord dependedent variables
+    acw = .25*c; %AC of wing chord
+    act = ct*.25; %AC of horizontal tail
+    vtailc = c; %chord of vertical tail
+    vtailac = vtailc*.25; %AC of vertical tail
+    vtailh = 1.5*vtailc;
+    htailc = c;
+    if(phiw == 0 && tapw == 0) %box wing check
+      Sw = bw*c;
+    end
+    if(phit == 0 && tapt == 0) %box wing check
+      St = bt*ct;
+    end
+    
     Xeng = rand()*(fuselageL - 0.6*fuselageL) + 0.6*fuselageL; %randomized the location of the motor cg between 0.6 and fuselageL
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
@@ -120,6 +136,7 @@ for i = 1:n
     if(Sref == 0)
         Sref = Sw;
     end
+
     %Recalculating Swet for changing fuselage diameter
     Swet = pi*(Df/2)^2 + T*bw + T*bt + T*vtailh;
     %% Niccolai Estimate
@@ -139,7 +156,7 @@ for i = 1:n
     %avioncis: length, x position (CG), z position (CG), weight
     avioarr = [0,      nosearr(2),      Df/2,            W_avionics];
     %filters:  length,                          x position (CG),  z position (CG), weight
-    filtarr = [fuselageL-nosearr(1)-tailarr(1), nosearr(1)+(fuselageL-nosearr(1)-tailarr(1)/2),      Df/2,            Wfilters];
+    filtarr = [fuselageL-nosearr(1)-tailarr(1), nosearr(1)+ Lfilters/2,      Df/2,            Wfilters];
     %fuselage: length,                          x position (CG),  z position (CG), weight
     fusearr = [fuselageL-nosearr(1)-tailarr(1), fuselageL/2,      Df/2,            Wf];
     %h. tail:   length, x position (CG), z position (CG), weight
@@ -153,14 +170,7 @@ for i = 1:n
     %landing gear: length, x position (CG), z position (CG), weight
     geararr =     [0,      Xwing/2 + acw,      Df/2,            W_landgear];
     %battery: length, x position (CG), z position (CG), weight
-    battarr =      [0.5,      nosearr(1),   Df/2,            Wbat];
-    % doubling up filters if leftover diameter with one filter is more than
-    % 5/8ths the diameter (somewhat arbitrary, can be changed to another
-    % preference)
-    if Df-.33 >= Df*5/8
-        filtarr(2) = nosearr(1)+(fuselageL-nosearr(1)-tailarr(1)/4); % halves effect of filters on CG location
-        doubledup = doubledup+1; % counts one doubling up
-    end
+    battarr =      [0.5,      nosearr(1),   Df/2,            Wbat + Winv];
     %               landing gear  nose cone    avionics       filters       fuselage       h. tail         engine          v. tail          wing            tail cone     battery
     Xarmarray =   [ geararr(2)    nosearr(2)   avioarr(2)     filtarr(2)    fusearr(2)     htailarr(2)     engarr(2)       vtailarr(2)      wingarr(2)      tailarr(2)    battarr(2)];     % x position from nose of masses's listed in weight array USED FOR INERTIAL AND CG CALC
     Zarmarray =   [ geararr(3)    nosearr(3)   avioarr(3)     filtarr(3)    fusearr(3)     htailarr(3)     engarr(3)       vtailarr(3)      wingarr(3)      tailarr(3)    battarr(3)];     % z position from aircraft centerline along bottom of fuselage of masses listed in weight array USED FOR INERTIAL AND CG CALC
