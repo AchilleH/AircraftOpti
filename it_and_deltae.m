@@ -1,8 +1,8 @@
 function [i_t, delta_e] = it_and_deltae(Data, rho, downwash, aoa, tau)
 
 % function calculates i_t and delta_e for TRIMMED FLIGHT (L = W)
-% still needs air density, range for angle of attack, and elevator airfoil
-% CM and CL to be user-defined
+% still needs air density rho, angle of attack range aoa, flap effectiveness 
+% factor tau, and downwash effect still need to be user-defined
 
 at = Data.CLta; % lift-curve slope for tail
 aw = Data.CLwa; % lift-curve slope for wing
