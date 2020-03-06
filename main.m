@@ -110,7 +110,7 @@ for i = 1:n
       St = bt*ct;
     end
     
-    Xeng = rand()*(fuselageL - 0.6*fuselageL) + 0.6*fuselageL; %randomized the location of the motor cg between 0.6 and fuselageL
+    Xeng = rand()*(fuselageL - 0.6*fuselageL - Lmot(j)/2) + 0.6*fuselageL; %randomized the location of the motor cg between 0.6 and fuselageL
     YZmotor = fuselageL-Lmot(j)*0.5; %distance between motor CG and YZ plane (total length minus half motor length, assuming motor CG is 1/2way)
 
     %% Dealing with Planform area, AR, & B; Also adjusts Sref if input is 0
