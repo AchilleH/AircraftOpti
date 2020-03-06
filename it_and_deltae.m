@@ -1,4 +1,4 @@
-function [i_t, delta_e] = it_and_deltae(Data, rho, downwash, aoa, CMdelta_e, CLdelta_e)
+function [i_t, delta_e] = it_and_deltae(Data, rho, downwash, aoa, tau)
 
 % function calculates i_t and delta_e for TRIMMED FLIGHT (L = W)
 % still needs air density, range for angle of attack, and elevator airfoil
@@ -16,6 +16,8 @@ Wtotal = Data.Wtotal; % total aircraft weight
 % preliminary calculations
 q = .5*rho*v^2; % dynamic pressure
 VH = -staticmargin*St/Sw; % tail volume ratio
+CLdelta_e = tau*at*St/Sw; % lift-curve slope for elevator
+CMdelta_e = -tau*at*VH; % Moment-curve slope for elevator
 
 % deterimining i_t from total lift equation on Lecture 10 Slide 251
 i_t = 1/at*Sw/St*(Wtotal/(q*Sw)-(aw+at*St/Sw*(1-epsal))*aoa);
