@@ -96,7 +96,7 @@ for i = 1:n
     %bt = rand()*(bw-7) + 2; %tail wingspan
     c = 2*bw/(Aw*(1+tapw));
     ct = 2*bt/(At*(1+tapt));
-
+    
     %Redefining chord dependedent variables
     acw = .25*c; %AC of wing chord
     act = ct*.25; %AC of horizontal tail
@@ -106,7 +106,7 @@ for i = 1:n
     htailc = c;
     Sw = bw*((c+tapw*c)/2);
     St = bt*((ct+tapt*ct)/2);
-
+    
     %fuselageL = rand()*(10 - 5 - Lmot(j)) + 5 + Lmot(j);
     Xeng = fuselageL - Lmot(j)/2;
     %Xeng = rand()*(fuselageL - 4.5 - Lmot(j)/2) + 4.5 + Lmot(j)/2; %randomized the location of the motor cg between 0.6 and fuselageL
@@ -200,8 +200,7 @@ for i = 1:n
 
     %% Performance
     [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead);
-    [i_t, delta_e, CL_tot] = it_and_deltae(Clta, Clwa, Vstall, Sw, St, W, staticmargin, rho, downwash, aoarange, 0.6);
-    L = CL_tot*.5*rho.*V.^2*S;
+    [i_t, delta_e, CL_tot] = it_and_deltae(CLta, CLwa, Vstall, Sw, St, W, staticmargin, rho, downwash, aoa, CMdelta_e, CLdelta_e);
     [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL_tot,CD,CDo,Pav,Pr,W,Vhead);
     %% Wing, Engine, Fuselage Inertias
     %Wing inertia (type is bool, 0 = wing, 1 = tail)
@@ -261,7 +260,6 @@ end
 %Successful Data arrays begin with 'H'
 %No preallocation for success arrays because it would saturate some number
 %likely zero if you use zeros()
-<<<<<<< HEAD
 HWe = [];
 HPe = [];
 HWT = [];
@@ -271,7 +269,6 @@ PPe = zeros(1,n);
 PXe = zeros(1,n);
 PTL = zeros(1,n);
 PWT = zeros(1,n);
-
 i2 = 1; %for successful trials
 for i = 1:n
     Data(i).result = test(Data(i));
@@ -281,7 +278,6 @@ for i = 1:n
         HWT(i2) = max(Data(i).Emax);
     %       HXe(i2) = Data(i).Xeng;
     %    HTL(i2) = Data(i).fuselageL;
-
         i2 = i2+1;
     end
     PWe(i) = Data(i).We;

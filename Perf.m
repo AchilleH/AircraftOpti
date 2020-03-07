@@ -83,16 +83,15 @@ TRmin = zeros(1,n);
         %Sa is air distance: use average T-D, V2 = 1.2 Vstall
         %Vlof is 1.1*Vmu, Vmu is the min speed aircraft could TO w/o stiking tail
         %on ground
-        %TO and landing calc not working, TO goest to inf, landing hovers around 0
-        Sg = ((Vlof - Vhead)^2 ./ (2*g*(T1./W - mu - (Cdg(i,i_stall) - mu*Clg(i,i_stall)).*q(in1)./(W./S))));
-        Sa = W ./ (T1 - 0.01.*D1) .* floor((V2.^2 - Vlof.^2)./(2.*g) + 15.24); %Relies on faa screen height converted to meters
-        Sto(i) = abs(Sg) + abs(Sa);
+        Sg = ((V2 - Vhead)^2 ./ (2*g*(T1./W - mu - (Cdg(i,i_stall) - mu*Clg(i,i_stall)).*q(i_stall)./(W./S))));
+        Sa = W ./ (T1 - D1) .* floor((V2.^2 - V2.^2)./(2.*g) + 15.24); %Relies on faa screen height converted to meters
+        Sto(i) = Sg + Sa;
 
         %landing, a is avg acceleration at 0.7Vtd
         a = T3-D3-mu.*(W-L3); %use
         Slg = (Vtd - Vhead).^2./(2.*a);
         Sa = W ./ (T2-D2) .* floor((Va.^2 - Vtd.^2)/(2.*g) + 15.24); %15.24 is faa screen height in meters
-        Sl(i) = abs(Slg) + abs(Sa);
+        Sl(i) = Slg + Sa;
 
         %Endurance and Range
         %metric units, km for distance

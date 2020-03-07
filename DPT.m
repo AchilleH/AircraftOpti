@@ -47,7 +47,7 @@ for nn = 1:n
 %%%Calculating Parasitic Drag Coefficient
     %Form Factor, K
     tdivc = t/c;        %thickness to chord ratio
-    K = (1 + (0.6/xdivc)*tdivc + 100*(tdivc^4))*1.34*(M.^0.18)*((cos(Y))^0.28);
+    K = (1 + (0.6/xdivc)*tdivc + 100*(tdivc^4))*(1.34*(M.^0.18)*((cos(Y))^0.28));
     %Interference Factor, Q
     Q = 1;      %fuselages and wings assumed negligible interference
     %Flat Plate Skin Friction, Cf

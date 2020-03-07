@@ -1,8 +1,8 @@
 function [] = dataAnalysis(Success,All,name)
 figure()
 hold
-histogram(Success);
-histogram(All);
+histogram(Success,80);
+histogram(All,80);
 legend('Successful','All');
 title(name);
 hold
