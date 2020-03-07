@@ -22,7 +22,7 @@ tapw = 1; tapt = tapw; %Taper for wing and tail
 phiw = 0; phit = phiw; %Sweep from horizontal/LE
 bw = 10.5; bt = bw/2; %Wingspans
 Clwo = 0.2; Clto = 0.2; %Cl at 0 aoa(y axis offset)
-T = 0.1*c; %Airfoil max thickness
+T = 0.12*c; %Airfoil max thickness
 aoarange = -8:1:8; %range of aoa to evaluate over
 wingtapfac = 1; % "wing taper factor", or what fraction of the root thickness is the tip thickness
 tailtapfac = 1; % "tail taper factor", or what fraction of the root thickness is the tip thickness
