@@ -2,7 +2,7 @@ function [Return] = test(UAV)
     %Tests the input UAV Strucutre if it meets mission specs and can reasonably fly
     %TODO: maybe have this function output the success histograms
     % Test for FAIL if it FAILS return false and return from function, This makes it easier to add/remove conditions. Also more flexible to edit if we want it to be auditable.
-    if min(UAV.Sto) > 122 || min(UAV.Sl) > 122 || min(UAV.Sto)==0 || min(UAV.Sl)==0
+    if min(UAV.Stoe) > 122 || min(UAV.Sle) > 122 || min(UAV.Stoe)==0 || min(UAV.Sle)==0
         Return = false;
         return;
     end

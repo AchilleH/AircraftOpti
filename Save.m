@@ -1,4 +1,4 @@
-function [Data] = Save(fuselageL,c,ct,Df,M,Rm,Lm,We,Pe,Rnac,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv)
+function [Data] = Save(Stoe,Sle,RCmine,RCmaxe,gamMine,gamMaxe,Rmine,Vstalle,fuselageL,c,ct,Df,M,Rm,Lm,We,Pe,Rnac,Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv)
 %% Physical Characteristics
 Data.fuselageL = fuselageL;
 Data.c = c;
@@ -46,14 +46,22 @@ Data.Dis = Dis;
 %% Performance
 Data.Sto = Sto;
 Data.Sl = Sl;
+Data.Stoe = Stoe;
+Data.Sle = Sle;
 Data.Emax = Emax;
 Data.Rmax = Rmax;
 Data.RCmin = RCmin;
 Data.RCmax = RCmax;
+Data.RCmine = RCmine;
+Data.RCmaxe = RCmaxe;
 Data.gamMin = gamMin;
 Data.gamMax = gamMax;
+Data.gamMine = gamMine;
+Data.gamMaxe = gamMaxe;
 Data.Rmin = Rmin;
+Data.Rmine = Rmine;
 Data.Vstall = Vstall;
+Data.Vstalle = Vstalle;
 %% CG
 Data.Xcg = XCG;
 Data.Zcg = ZCG;

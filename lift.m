@@ -1,4 +1,4 @@
-function [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange,aoa)
+function [Sw,St,CLwa,CLta,CLw,CLt,CL,CLe,CLmax,CLemax,Lw,Lt,Le,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange,aoa,tau,ealph)
 %Lift Calculation Block,[W,Sw,St,CLwa,CLta,Lw,Lt,bw,bt,ARw,ARt,ew,et] = lift(rho,Clwa,Clta,ew,et,W,Sw,St,bw,bt,ARw,ARt,Df,tapw,tapt,phiw,phit,Vrange)  Leave a 0 in 1 argument to have it return the design
 %value. For CL leave a 0 in Cl to have it generate CL. Df is fuselage
 %diameter and will be used to approximate e if e == 0, along with
@@ -45,22 +45,37 @@ CLta = getCL(beta,nut,phit,St,Sref,Df,bt,ARt);
 %% running lift Equation calculations
 qw = .5 .* Vrange.^2 .* rho .* Sw; %L = .5 * rho * v^2 * S * CL
 qt = .5 .* Vrange.^2 .* rho .* St;
+Clew = tau * ealph * Clwa; %Elevator effect on CL at max deflection for wing
+Clet = tau * ealph * Clta; %uses lowercase l but for 3d case, assumes the deflection is essentially = to deflection of wing
 CLw = meshgrid(CLwa,aoa);
 CLt = meshgrid(CLta,aoa);
+CLew = meshgrid(CLwa,aoa);
+CLet = meshgrid(CLta,aoa);
 Lw = meshgrid(qw,aoa);
+Lew = meshgrid(qw,aoa);
 Lt = meshgrid(qt,aoa);
+Let = meshgrid(qt,aoa);
 
     for I = 1:length(aoa)
      CLw(I,:) = CLw(I,:) * aoa(I) + Clwo;
      CLt(I,:) = CLt(I,:) * aoa(I) + Clto;
+     CLew(I,:) = CLw(I,:) + Clew;
+     CLet(I,:) = CLt(I,:) + Clet;
+     Lew(I,:) = Lw(I,:) .* CLew(I,:);
      Lw(I,:) = Lw(I,:) .* CLw(I,:);
+     Let(I,:) = Lt(I,:) .* CLet(I,:);
      Lt(I,:) = Lt(I,:) .* CLw(I,:);
     end
+    Le = Lew + Let;
     S = Sw+St;
     CLwmax = CLw(length(aoa),:);
     CLtmax = CLt(length(aoa),:);
+    CLewmax = CLew(length(aoa),:);
+    CLetmax = CLet(length(aoa),:);
     CLmax = Sw/S*CLwmax + St/S*CLtmax;
+    CLemax = Sw/S*CLewmax + St/S*CLetmax;
     CL = Sw/S*CLw + St/S*CLt;
+    CLe = Sw/S*CLew + St/S*CLet;
 end
 
 

@@ -74,7 +74,7 @@ TRmin = zeros(1,n);
         RC = (Pav(i_stall:end) - Preq(i_stall:end))./W;
         RCmin(i) = min(RC);
         RCmax(i) = max(RC);
-        gam = (Pav(i_stall:end) - Preq(i_stall:end))./(W.*V(i_stall:end));
+        gam = RC./V(i_stall:end);
         gamMin(i) = min(gam);
         gamMax(i) = max(gam);
 
