@@ -30,6 +30,8 @@ wingroot_T = T; % thickness of wing airfoil root
 wingtip_T = wingtapfac*wingroot_T; % thickness of wing airfoil tip
 tailroot_T = T; % thickness of tail airfoil root
 tailtip_T = tailtapfac*tailroot_T; % thickness of tail airfoil tip
+tau = 0.6; %ratio of wingspan to span of elevator
+ealph = 30; %max deflection of elevator in [deg]
 
 %AIRCRAFT DATA
 Wb = 400; % weight of the body(minus engine) [kg]
@@ -84,7 +86,7 @@ for i = 1:n
     %% Calculation Control
     %if you add to here, also add to save
     %j = ceil(rand()*(length(We) - 5)); %Chooses a random engine, now the last 5 removed due to impossible geometry
-    j = 1;
+    j = 6;
     PE = Pe(j); %engine power
     Winv = ((PE/1000-0.75)/(450-0.75))*297 + 3; %inverter weight estimate based on alibaba specs
 
@@ -180,7 +182,7 @@ for i = 1:n
     tailac = htailarr(2)-wingarr(2)-.25*c; % Position of tail AC relative to wing LE USED IN INERTIAL AND NEUTRAL POINT CALC
 
     %% Lift
-    [Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange);
+    [Sw,St,CLwa,CLta,CLw,CLt,CL,CLe,CLmax,CLemax,Lw,Lt,Le,bw,bt,Aw,At,ew,et] = lift(rho,Clwa,Clta,Clwo,Clto,Sw,St,Sref,bw,bt,Aw,At,Df,tapw,tapt,phiw,phit,V,aoarange,tau,ealph);
     L = Lw + Lt;
     %planform surface area of plane
     S = Sw+St; %assuming only wings provide lift
@@ -200,9 +202,7 @@ for i = 1:n
 
     %% Performance
     [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL,CD,CDo,Pav,Pr,W,Vhead);
-    [i_t, delta_e, CL_tot] = it_and_deltae(Clta, Clwa, Vstall, Sw, St, W, staticmargin, rho, downwash, aoarange, 0.6);
-    L = CL_tot*.5*rho.*V.^2*S;
-    [Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall] = Perf(length(aoarange),C,rho,Tav,V,D,S,L,k,np,CL_tot,CD,CDo,Pav,Pr,W,Vhead);
+    [Stoe,Sle,~,~,RCmine,RCmaxe,gamMine,gamMaxe,Rmine,Vstalle] = Perf(length(aoarange),C,rho,Tav,V,D,S,Le,k,np,CLe,CD,CDo,Pav,Pr,W,Vhead);
     %% Wing, Engine, Fuselage Inertias
     %Wing inertia (type is bool, 0 = wing, 1 = tail)
     %Wing inertia seems to need at least 2 calls, maybe 4?
@@ -252,7 +252,7 @@ for i = 1:n
 
     %% Saving the Data, considering
     %Change the static stab. var when ryan's functions function
-    Data(i) = Save(fuselageL,c,ct,Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv);
+    Data(i) = Save(Stoe,Sle,RCmine,RCmaxe,gamMine,gamMaxe,Rmine,Vstalle,fuselageL,c,ct,Df,Motors(j),Rmot(j),Lmot(j),We(j),Pe(j),Rnac(j),Sw,St,CLwa,CLta,CLw,CLt,CL,CLmax,Lw,Lt,bw,bt,Aw,At,ew,et,CDi,CDo,CD,D,Ds,Di,Dis,Do,Tr,np,Pav,Tav,Pr,Sto,Sl,Emax,Rmax,RCmin,RCmax,gamMin,gamMax,Rmin,Vstall,XCG,ZCG,Wtotal,hn,Xeng,staticmargin,Winv);
 end
 
 %% Spec Verification and Plotting
@@ -261,7 +261,6 @@ end
 %Successful Data arrays begin with 'H'
 %No preallocation for success arrays because it would saturate some number
 %likely zero if you use zeros()
-<<<<<<< HEAD
 HWe = [];
 HPe = [];
 HWT = [];
