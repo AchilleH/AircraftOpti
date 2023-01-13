@@ -90,7 +90,6 @@ Wsc=1.066*W^0.626;
 
 Wau=W_avionics;
 
-
 %% Payload Weight
 
 Wpl= W_payload;
